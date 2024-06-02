@@ -1,0 +1,188 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "3.5.0",
+    "title": "Stable Diffusion API",
+    "description": "API for generating images from text prompts using Express.js & Prodia.",
+    "contact": {
+      "name": "RizzyFuzz",
+      "url": "https://stablediff.rizzy.eu.org",
+      "email": "support@rizzy.eu.org"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://stablediff.rizzy.eu.org",
+      "description": "Production server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "API AI",
+      "description": "Endpoints related to generating images using AI"
+    },
+    {
+      "name": "Check Models",
+      "description": "Endpoints to check available models for image generation"
+    }
+  ],
+  "paths": {
+    "/api/v1/generateImage": {
+      "get": {
+        "tags": [
+          "API AI"
+        ],
+        "summary": "Generate Image from Text Prompt",
+        "description": "Endpoint to generate an image based on the provided text prompt and other parameters.",
+        "parameters": [
+          {
+            "name": "prompt",
+            "in": "query",
+            "required": true,
+            "description": "The text prompt for image generation.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "typeModel",
+            "in": "query",
+            "required": true,
+            "description": "The type of model (default or SDXL).",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "default",
+                "SDXL"
+              ]
+            }
+          },
+          {
+            "name": "model",
+            "in": "query",
+            "required": true,
+            "description": "The model to use for image generation.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "stylePreset",
+            "in": "query",
+            "required": false,
+            "description": "The style preset for image generation.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "image/png": {}
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "content": {
+                      "type": "string",
+                      "example": "Bad Request"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "Invalid model parameter for the specified typeModel, model, or stylePreset"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 500
+                    },
+                    "content": {
+                      "type": "string",
+                      "example": "Internal Server Error"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "Failed to process the request"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/models": {
+      "get": {
+        "tags": [
+          "Check Models"
+        ],
+        "summary": "Get Available Models",
+        "description": "Endpoint to get the available models for image generation.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Model": {
+                      "type": "object",
+                      "properties": {
+                        "default": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "example": "absolutereality_v181.safetensors [3d9d4d2b]"
+                          }
+                        },
+                        "sdxl": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "example": "sd_xl_base_1.0.safetensors [be9edd61]"
+                          }
+                        }
+                      }
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "creator": {
+                      "type": "string",
+                      "example": "Stable Diffusion - ©RizzyFuzz & FastURL"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

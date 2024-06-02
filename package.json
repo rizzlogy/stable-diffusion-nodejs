@@ -1,0 +1,27 @@
+{
+    "name": "stable-diffusion",
+    "version": "1.0.0",
+    "description": "ok",
+    "main": "connect.js",
+    "scripts": {
+        "start": "node connect.js"
+    },
+    "keywords": [
+        "stable diffusion",
+        "prodia.js",
+        "nodejs",
+        "web"
+    ],
+    "author": "RizzyFuzz & FastURL",
+    "license": "MIT",
+    "dependencies": {
+        "axios": "^1.7.2",
+        "body-parser": "^1.20.2",
+        "chalk": "^4.1.2",
+        "cors": "^2.8.5",
+        "express": "^4.17.1",
+        "morgan": "^1.10.0",
+        "swagger-ui-express": "github:rizzlogy/swagger-ui-express",
+        "prodia.js": "^3.0.0"
+    }
+}
