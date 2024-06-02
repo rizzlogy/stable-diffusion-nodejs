@@ -22,7 +22,8 @@
       "photographic",
       "pixel-art",
       "texture",
-      "craft-clay"
+      "craft-clay",
+      ""
     ],
     "validModelsSDXL": [
       "sd_xl_base_1.0.safetensors [be9edd61]",
