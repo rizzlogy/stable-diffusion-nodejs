@@ -19,7 +19,7 @@ app.set("json spaces", 2);
 app.set("trust proxy", true);
 app.enable("trust proxy");
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(swaggerUi.serve);
 app.use(cors());
 
