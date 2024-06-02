@@ -155,7 +155,7 @@ app.get("/api/v1/generateImage", async (req, res) => {
   }
 
   try {
-    const result = typeModelLowerCase === "sdxl" ? await generateImageSDXL({ prompt, model, style_preset: stylePreset || "" }) : await generateImage({ prompt, model, style_preset: stylePreset || "", height: height || 1024, width: width || 1024, upscale: });
+    const result = typeModelLowerCase === "sdxl" ? await generateImageSDXL({ prompt, model, style_preset: stylePreset || "" }) : await generateImage({ prompt, model, style_preset: stylePreset || "", height: height || 1024, width: width || 1024, upscale });
     const { status, imageUrl } = await wait(result);
 
     if (status === "failed") {
