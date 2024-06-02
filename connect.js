@@ -151,6 +151,10 @@ app.get("/api/v1/generateImage", async (req, res) => {
 
   try {
     const generateFunc = typeModelLowerCase === "sdxl" ? generateImageSDXL : generateImage;
+    
+    // Logging parameters before calling generateFunc
+    console.log('Parameters passed to generateFunc:', { prompt, model, stylePreset, height, width, upscale });
+
     const result = await generateFunc({ prompt, model, style_preset: stylePreset, height: height || 1024, width: width || 1024, upscale });
     const { status, imageUrl } = await wait(result);
 
@@ -174,6 +178,11 @@ app.get("/api/v1/generateImage", async (req, res) => {
     console.log("Image sent successfully");
   } catch (e) {
     console.error("Error occurred:", e.message);
+
+    if (e.response && e.response.data) {
+      console.error("Error response data:", e.response.data);
+    }
+
     return res.status(500).json({
       content: "Internal Server Error",
       status: 500,
