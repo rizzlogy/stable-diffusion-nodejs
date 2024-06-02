@@ -155,9 +155,7 @@ app.get("/api/v1/generateImage", async (req, res) => {
   }
 
   try {
-    const execute = typeModelLowerCase === "sdxl" ? generateImageSDXL : generateImage;
-
-    const result = await execute({ prompt, model, style_preset: stylePreset ?  stylePreset : null });
+    const result = typeModelLowerCase === "sdxl" ? await generateImageSDXL({ prompt, model, style_preset }) : await generateImage({ prompt, model, style_preset });
     const { status, imageUrl } = await wait(result);
 
     if (status === "failed") {
