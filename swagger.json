@@ -52,7 +52,7 @@
             "name": "enhance",
             "in": "query",
             "required": true,
-            "description": "The type of enhance for image (false or true).",
+            "description": "The type of enhance for image.",
             "schema": {
               "type": "string",
               "enum": [
@@ -65,7 +65,7 @@
             "name": "typeModel",
             "in": "query",
             "required": true,
-            "description": "The type of model (default or SDXL).",
+            "description": "The type of model.",
             "schema": {
               "type": "string",
               "enum": [
@@ -86,8 +86,26 @@
           {
             "name": "stylePreset",
             "in": "query",
-            "required": false,
+            "required": true,
             "description": "The style preset for image generation.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "height",
+            "in": "query",
+            "required": true,
+            "description": "The Image Height.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "width",
+            "in": "query",
+            "required": true,
+            "description": "The Image width.",
             "schema": {
               "type": "string"
             }
