@@ -127,19 +127,14 @@ app.get("/api/v1/generateImage", async (req, res) => {
 
   const typeModelLowerCase = typeModel.toLowerCase();
 
-  if (typeModelLowerCase === "sdxl" && !config.Model.validModelsSDXL.includes(model)) {
-    console.log("Invalid model for SDXL. Please choose a valid SDXL model. See list model in '/api/v1/models'.");
+  if (
+    (typeModelLowerCase === "sdxl" && !config.Model.validModelsSDXL.includes(model)) ||
+    (typeModelLowerCase === "default" && !config.Model.validModelsDefault.includes(model))
+  ) {
+    const validModels = typeModelLowerCase === "sdxl" ? "SDXL" : "default";
+    console.log(`Invalid model for ${validModels}. Please choose a valid ${validModels} model. See list of models in '/api/v1/models'.`);
     return res.status(400).json({
-      content: "Invalid model for SDXL. Please choose a valid SDXL model. See list model in '/api/v1/models'.",
-      status: 400,
-      creator: `${config.Setup.apiName} - ${config.Setup.creator}`,
-    });
-  }
-
-  if (typeModelLowerCase === "default" && !config.Model.validModelsDefault.includes(model)) {
-    console.log("Invalid model for default. Please choose a valid default model. See list model in '/api/v1/models'.");
-    return res.status(400).json({
-      content: "Invalid model for default. Please choose a valid default model. See list model in '/api/v1/models'.",
+      content: `Invalid model for ${validModels}. Please choose a valid ${validModels} model. See list of models in '/api/v1/models'.`,
       status: 400,
       creator: `${config.Setup.apiName} - ${config.Setup.creator}`,
     });
@@ -155,7 +150,8 @@ app.get("/api/v1/generateImage", async (req, res) => {
   }
 
   try {
-    const result = typeModelLowerCase === "sdxl" ? await generateImageSDXL({ prompt, model, style_preset: stylePreset || "" }) : await generateImage({ prompt, model, style_preset: stylePreset || "", height: height || 1024, width: width || 1024, upscale });
+    const generateFunc = typeModelLowerCase === "sdxl" ? generateImageSDXL : generateImage;
+    const result = await generateFunc({ prompt, model, style_preset: stylePreset || "", height: height || 1024, width: width || 1024, upscale });
     const { status, imageUrl } = await wait(result);
 
     if (status === "failed") {
