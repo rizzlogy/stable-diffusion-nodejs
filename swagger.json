@@ -73,42 +73,12 @@
           {
             "name": "stylePreset",
             "in": "query",
-            "required": false,
+            "required": true,
             "description": "The style preset for image generation.",
             "schema": {
               "type": "string"
             }
           },
-          {
-            "name": "height",
-            "in": "query",
-            "required": false,
-            "description": "The image height.",
-            "schema": {
-              "type": "integer",
-              "default": 1024
-            }
-          },
-          {
-            "name": "width",
-            "in": "query",
-            "required": false,
-            "description": "The image width.",
-            "schema": {
-              "type": "integer",
-              "default": 1024
-            }
-          },
-          {
-            "name": "upscale",
-            "in": "query",
-            "required": false,
-            "description": "Whether to upscale the image.",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          }
         ],
         "responses": {
           "200": {
