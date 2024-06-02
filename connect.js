@@ -105,17 +105,10 @@ app.get("/api/v1/models", (req, res) => {
   res.status(200).json({
     Model: {
       default: config.Model.validModelsDefault,
-      sdxl: config.Model.validModelsSDXL,
-    },
-    status: 200,
-    creator: `${config.Setup.apiName} - ${config.Setup.creator}`,
-  });
-});
-
-app.get("/api/v1/generateImage", async (req, res) => {
+      sdxl: config.app.get("/api/v1/generateImage", async (req, res) => {
   console.log("Received request for /api/v1/generateImage");
 
-  const { prompt, model, typeModel, stylePreset, height, width, upscale } = req.query;
+  const { prompt, model, typeModel, stylePreset = "", height, width, upscale } = req.query;
 
   if (!prompt || !model || !typeModel) {
     return res.status(400).json({
@@ -151,7 +144,7 @@ app.get("/api/v1/generateImage", async (req, res) => {
 
   try {
     const generateFunc = typeModelLowerCase === "sdxl" ? generateImageSDXL : generateImage;
-    const result = await generateFunc({ prompt, model, style_preset: stylePreset || "", height: height || 1024, width: width || 1024, upscale });
+    const result = await generateFunc({ prompt, model, style_preset: stylePreset, height: height || 1024, width: width || 1024, upscale });
     const { status, imageUrl } = await wait(result);
 
     if (status === "failed") {
@@ -180,6 +173,12 @@ app.get("/api/v1/generateImage", async (req, res) => {
       creator: `${config.Setup.apiName} - ${config.Setup.creator}`,
     });
   }
+});
+Model.validModelsSDXL,
+    },
+    status: 200,
+    creator: `${config.Setup.apiName} - ${config.Setup.creator}`,
+  });
 });
 
 app.get("/api/v1/styleSheet", (req, res) => {
