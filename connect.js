@@ -115,7 +115,7 @@ app.get("/api/v1/models", (req, res) => {
 app.get("/api/v1/generateImage", async (req, res) => {
   console.log("Received request for /api/v1/generateImage");
 
-  const { prompt, model, typeModel, stylePreset, height, weight, sampler } = req.query;
+  const { prompt, model, typeModel, stylePreset, height, width, sampler } = req.query;
 
   if (!prompt || !model || !typeModel) {
     return res.status(400).json({
