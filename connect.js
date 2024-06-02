@@ -105,7 +105,14 @@ app.get("/api/v1/models", (req, res) => {
   res.status(200).json({
     Model: {
       default: config.Model.validModelsDefault,
-      sdxl: config.app.get("/api/v1/generateImage", async (req, res) => {
+      sdxl: config.Model.validModelsSDXL,
+    },
+    status: 200,
+    creator: `${config.Setup.apiName} - ${config.Setup.creator}`,
+  });
+});
+
+app.get("/api/v1/generateImage", async (req, res) => {
   console.log("Received request for /api/v1/generateImage");
 
   const { prompt, model, typeModel, stylePreset = "", height, width, upscale } = req.query;
@@ -173,12 +180,6 @@ app.get("/api/v1/models", (req, res) => {
       creator: `${config.Setup.apiName} - ${config.Setup.creator}`,
     });
   }
-});
-Model.validModelsSDXL,
-    },
-    status: 200,
-    creator: `${config.Setup.apiName} - ${config.Setup.creator}`,
-  });
 });
 
 app.get("/api/v1/styleSheet", (req, res) => {
