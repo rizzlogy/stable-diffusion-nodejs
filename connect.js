@@ -155,7 +155,7 @@ app.get("/api/v1/generateImage", async (req, res) => {
     // Logging parameters before calling generateFunc
     console.log('Parameters passed to generateFunc:', { prompt, model, stylePreset, height, width, upscale });
 
-    const result = await generateFunc({ prompt, model, style_preset: stylePreset, height: height || 1024, width: width || 1024, upscale });
+    const result = await generateFunc({ prompt, model, style_preset: stylePreset, height, width, upscale });
     const { status, imageUrl } = await wait(result);
 
     if (status === "failed") {
