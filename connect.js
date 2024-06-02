@@ -19,7 +19,7 @@ app.set("json spaces", 2);
 app.set("trust proxy", true);
 app.enable("trust proxy");
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(swaggerUi.serve);
 app.use(cors());
 
@@ -115,7 +115,7 @@ app.get("/api/v1/models", (req, res) => {
 app.get("/api/v1/generateImage", async (req, res) => {
   console.log("Received request for /api/v1/generateImage");
 
-  const { prompt, model, typeModel, stylePreset = '' } = req.query;
+  const { prompt, model, typeModel, stylePreset } = req.query;
 
   if (!prompt || !model || !typeModel) {
     return res.status(400).json({
@@ -157,7 +157,7 @@ app.get("/api/v1/generateImage", async (req, res) => {
   try {
     const execute = typeModelLowerCase === "sdxl" ? generateImageSDXL : generateImage;
 
-    const result = await execute({ prompt, model, style_preset: stylePreset = null });
+    const result = await execute({ prompt, model, style_preset: stylePreset ?  stylePreset : null });
     const { status, imageUrl } = await wait(result);
 
     if (status === "failed") {
