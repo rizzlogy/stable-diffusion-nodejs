@@ -52,7 +52,7 @@
             "name": "typeModel",
             "in": "query",
             "required": true,
-            "description": "The type of model (default or SDXL).",
+            "description": "The type of model.",
             "schema": {
               "type": "string",
               "enum": [
@@ -77,6 +77,39 @@
             "description": "The style preset for image generation.",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "height",
+            "in": "query",
+            "required": false,
+            "description": "The image height.",
+            "schema": {
+              "type": "integer",
+              "default": 1024
+            }
+          },
+          {
+            "name": "width",
+            "in": "query",
+            "required": false,
+            "description": "The image width.",
+            "schema": {
+              "type": "integer",
+              "default": 720
+            }
+          },
+          {
+            "name": "upscale",
+            "in": "query",
+            "required": false,
+            "description": "Whether to upscale the image.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "false",
+                "true"
+              ]
             }
           }
         ],
@@ -191,7 +224,7 @@
     "/api/v1/styleSheet": {
       "get": {
         "tags": [
-          "Style Presets"
+          "Check Style"
         ],
         "summary": "Get Available Style Presets",
         "description": "Endpoint to get the available style presets for image generation.",
