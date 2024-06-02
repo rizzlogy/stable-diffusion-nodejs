@@ -3,7 +3,7 @@
   "info": {
     "version": "3.5.0",
     "title": "Stable Diffusion API",
-    "description": "API for generating images from text prompts using Express.js & Prodia.",
+    "description": "API for generating images from text prompts using Prodia.",
     "contact": {
       "name": "RizzyFuzz",
       "url": "https://stablediff.rizzy.eu.org",
@@ -24,6 +24,10 @@
     {
       "name": "Check Models",
       "description": "Endpoints to check available models for image generation"
+    },
+    {
+      "name": "Check Style Presets",
+      "description": "Endpoints to check available style presets for image generation"
     }
   ],
   "paths": {
@@ -166,6 +170,44 @@
                             "example": "sd_xl_base_1.0.safetensors [be9edd61]"
                           }
                         }
+                      }
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "creator": {
+                      "type": "string",
+                      "example": "Stable Diffusion - ©RizzyFuzz & FastURL"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/styleSheet": {
+      "get": {
+        "tags": [
+          "Check Style Presets"
+        ],
+        "summary": "Get Available Style Presets",
+        "description": "Endpoint to get the available style presets for image generation.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "stylePresets": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "example": "default"
                       }
                     },
                     "status": {
