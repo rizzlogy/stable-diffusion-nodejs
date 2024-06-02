@@ -188,6 +188,14 @@ app.get("/api/v1/generateImage", async (req, res) => {
   }
 });
 
+app.get("/api/v1/styleSheet", (req, res) => {
+  res.status(200).json({
+    stylePresets: config.Model.validStylePresets,
+    status: 200,
+    creator: `${config.Setup.apiName} - ${config.Setup.creator}`,
+  });
+});
+
 app.use((req, res, next) => {
   res.status(404).json({
     content: "Not Found!",
