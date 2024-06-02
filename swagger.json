@@ -52,7 +52,7 @@
             "name": "typeModel",
             "in": "query",
             "required": true,
-            "description": "The type of model.",
+            "description": "The type of model (default or SDXL).",
             "schema": {
               "type": "string",
               "enum": [
@@ -73,12 +73,12 @@
           {
             "name": "stylePreset",
             "in": "query",
-            "required": true,
+            "required": false,
             "description": "The style preset for image generation.",
             "schema": {
               "type": "string"
             }
-          },
+          }
         ],
         "responses": {
           "200": {
@@ -191,7 +191,7 @@
     "/api/v1/styleSheet": {
       "get": {
         "tags": [
-          "Check Style Presets"
+          "Style Presets"
         ],
         "summary": "Get Available Style Presets",
         "description": "Endpoint to get the available style presets for image generation.",
