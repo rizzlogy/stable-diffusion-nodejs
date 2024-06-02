@@ -19,7 +19,7 @@ app.set("json spaces", 2);
 app.set("trust proxy", true);
 app.enable("trust proxy");
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(swaggerUi.serve);
 app.use(cors());
 
@@ -157,7 +157,7 @@ app.get("/api/v1/generateImage", async (req, res) => {
   try {
     const execute = typeModelLowerCase === "sdxl" ? generateImageSDXL : generateImage;
 
-    const result = await execute({ prompt, model, style_preset: stylePreset });
+    const result = await execute({ prompt, model, style_preset: stylePreset = null });
     const { status, imageUrl } = await wait(result);
 
     if (status === "failed") {
