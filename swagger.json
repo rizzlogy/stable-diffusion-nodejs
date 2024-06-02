@@ -49,19 +49,6 @@
             }
           },
           {
-            "name": "enhance",
-            "in": "query",
-            "required": true,
-            "description": "The type of enhance for image.",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "false",
-                "true"
-              ]
-            }
-          },
-          {
             "name": "typeModel",
             "in": "query",
             "required": true,
