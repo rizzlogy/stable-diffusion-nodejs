@@ -45,7 +45,7 @@
             "required": true,
             "description": "The text prompt for image generation.",
             "schema": {
-              "type": "integer",
+              "type": "string",
               "default": "space warrior, beautiful, female, ultrarealistic, soft lighting, 8k"
             }
           },
@@ -55,7 +55,7 @@
             "required": false,
             "description": "The text negative prompt for image generation.",
             "schema": {
-              "type": "integer",
+              "type": "string",
               "default": "3d, cartoon, anime, (deformed eyes, nose, ears, nose), bad anatomy, ugly"
             }
           },
@@ -78,7 +78,7 @@
             "required": true,
             "description": "The model to use for image generation.",
             "schema": {
-              "type": "integer",
+              "type": "string",
               "default": "absolutereality_v181.safetensors [3d9d4d2b]"
             }
           },
