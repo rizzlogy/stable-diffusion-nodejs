@@ -71,10 +71,10 @@ app.get("/", (req, res) => {
         swaggerUi.generateHTML(swaggerDocument, {
             customCss: `.swagger-ui .topbar .download-url-wrapper { display: none } 
                         .swagger-ui .topbar-wrapper img[alt="Stable Diffusion API"], .topbar-wrapper span { visibility: collapse; }
-                        .swagger-ui .topbar-wrapper img { content: url("https://fasturl.cloud/content/FastURL_SlimLogoSC.png"); }
+                        .swagger-ui .topbar-wrapper img { content: url("https://i.ibb.co.com/F6CS4fP/Tak-berjudul2-20240604073140.png"); }
                         .swagger-ui .opblock-section-body .parameters-col_description { width: 50px; }
                         .swagger-ui .response-col_links { display: none; }`,
-            customfavIcon: "https://fasturl.cloud/content/FastURL_SlimLogoSC.png",
+            customfavIcon: "https://i.ibb.co.com/878zHng/Tak-berjudul4-20240604073614.png",
             customSiteTitle: swaggerDocument.info.title,
             customSiteDesc: swaggerDocument.info.description,
         })
