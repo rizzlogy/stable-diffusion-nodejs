@@ -101,11 +101,12 @@ app.get("/api/v1/models", (req, res) => {
 app.get("/api/v1/generateImage", async (req, res) => {
   console.log("Received request for /api/v1/generateImage");
 
-  const { prompt, model, typeModel, stylePreset, height, width, upscale } = req.query;
+  const { prompt, model, typeModel, stylePreset, height, width, upscale, negativePrompt } = req.query;
 
   // Log all incoming parameters
   console.log("Incoming parameters:", {
     prompt,
+    negativePrompt,
     model,
     typeModel,
     stylePreset,
@@ -175,10 +176,13 @@ app.get("/api/v1/generateImage", async (req, res) => {
     const result = await generateFunc({
       prompt: prompt.trim(),
       model: model.trim(),
-      style_preset: stylePreset ? stylePreset.trim() : undefined,
+      style_preset: stylePreset ? stylePreset.trim() : "",
       height: parseInt(height),
       width: parseInt(width),
-      sampler: "DPM++ 2M Karras"
+      sampler: "DPM++ 2M Karras",
+      seed: -1,
+      negative_prompt: negativePrompt ? negativePrompt.trim() : "",
+      steps: 20,
     });
 
     const { status, imageUrl } = await wait(result);
