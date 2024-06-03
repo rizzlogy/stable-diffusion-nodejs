@@ -127,8 +127,8 @@ app.get("/api/v1/generateImage", async (req, res) => {
     const typeModelLowerCase = typeModel.toLowerCase();
 
     if (
-        (typeModelLowerCase === "sdxl" && !config.Model.validModelsSDXL.hasOwnProperty(model)) ||
-        (typeModelLowerCase === "default" && !config.Model.validModelsDefault.hasOwnProperty(model))
+        (typeModelLowerCase === "sdxl" && !config.Model.validModelsSDXL.hasOwnProperty(model.toLowerCase())) ||
+        (typeModelLowerCase === "default" && !config.Model.validModelsDefault.hasOwnProperty(model.toLowerCase()))
     ) {
         const validModels = typeModelLowerCase === "sdxl" ? "SDXL" : "default";
         console.log(chalk.yellow(`Invalid model for ${validModels}. Please choose a valid ${validModels} model. See list of models in '/api/v1/models'.`));
@@ -139,7 +139,7 @@ app.get("/api/v1/generateImage", async (req, res) => {
         });
     }
 
-    if (stylePreset && !config.Model.validStylePresets.hasOwnProperty(stylePreset)) {
+    if (stylePreset && !config.Model.validStylePresets.hasOwnProperty(stylePreset.toLowerCase())) {
         console.log(chalk.yellow("Invalid style preset. Please choose a valid style preset."));
         return res.status(400).json({
             content: "Invalid style preset. Please choose a valid style preset.",
@@ -172,22 +172,10 @@ app.get("/api/v1/generateImage", async (req, res) => {
     }
 
     try {
-        const generateFunc = typeModelLowerCase === "sdxl" ? generateImageSDXL : generateImage;
-
-        console.log(chalk.blue('Parameters passed to generateFunc:'), {
+        var result = typeModelLowerCase === "sdxl" ? generateImageSDXL({
             prompt: prompt.trim(),
-            negativePrompt: negativePrompt ? negativePrompt.trim() : "",
-            model: config.Model.validModelsDefault[model],
-            stylePreset: stylePreset ? config.Model.validStylePresets[stylePreset] : undefined,
-            height,
-            width,
-            upscale: upscale === "true",
-        });
-
-        const result = await generateFunc({
-            prompt: prompt.trim(),
-            model: config.Model.validModelsDefault[model],
-            style_preset: stylePreset ? config.Model.validStylePresets[stylePreset] : undefined,
+            model: config.Model.validModelsSDXL[model.toLowerCase()],
+            style_preset: stylePreset ? config.Model.validStylePresets[stylePreset.toLowerCase()] : "",
             height: parseInt(height),
             width: parseInt(width),
             sampler: "DPM++ 2M Karras",
@@ -196,6 +184,28 @@ app.get("/api/v1/generateImage", async (req, res) => {
             negative_prompt: negativePrompt ? negativePrompt.trim() : "",
             steps: 20,
             upscale: upscale === "true",
+        }) : generateImage({
+            prompt: prompt.trim(),
+            model: config.Model.validModelsDefault[model.toLowerCase()],
+            style_preset: stylePreset ? config.Model.validStylePresets[stylePreset.toLowerCase()] : "",
+            height: parseInt(height),
+            width: parseInt(width),
+            sampler: "DPM++ 2M Karras",
+            seed: -1,
+            cfg_scale: 7,
+            negative_prompt: negativePrompt ? negativePrompt.trim() : "",
+            steps: 20,
+            upscale: upscale === "true",
+        });
+
+        console.log(chalk.blue('Parameters passed to generateFunc:'), {
+            prompt: prompt.trim(),
+            negativePrompt: negativePrompt ? negativePrompt.trim() : "",
+            model: config.Model.validModelsDefault[model],
+            stylePreset: stylePreset ? config.Model.validStylePresets[stylePreset] : "",
+            height,
+            width,
+            upscale,
         });
 
         const { status, imageUrl } = await wait(result);
