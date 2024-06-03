@@ -45,7 +45,18 @@
             "required": true,
             "description": "The text prompt for image generation.",
             "schema": {
-              "type": "string"
+              "type": "integer",
+              "default": "space warrior, beautiful, female, ultrarealistic, soft lighting, 8k"
+            }
+          },
+          {
+            "name": "negativePrompt",
+            "in": "query",
+            "required": false,
+            "description": "The text negative prompt for image generation.",
+            "schema": {
+              "type": "integer",
+              "default": "3d, cartoon, anime, (deformed eyes, nose, ears, nose), bad anatomy, ugly"
             }
           },
           {
@@ -67,7 +78,8 @@
             "required": true,
             "description": "The model to use for image generation.",
             "schema": {
-              "type": "string"
+              "type": "integer",
+              "default": "absolutereality_v181.safetensors [3d9d4d2b]"
             }
           },
           {
@@ -82,7 +94,7 @@
           {
             "name": "height",
             "in": "query",
-            "required": false,
+            "required": true,
             "description": "The image height.",
             "schema": {
               "type": "integer",
@@ -92,24 +104,11 @@
           {
             "name": "width",
             "in": "query",
-            "required": false,
+            "required": true,
             "description": "The image width.",
             "schema": {
               "type": "integer",
               "default": 720
-            }
-          },
-          {
-            "name": "upscale",
-            "in": "query",
-            "required": false,
-            "description": "Whether to upscale the image.",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "false",
-                "true"
-              ]
             }
           }
         ],
