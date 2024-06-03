@@ -179,6 +179,7 @@ app.get("/api/v1/generateImage", async (req, res) => {
       style_preset: stylePreset ? stylePreset.trim() : "",
       height: parseInt(height),
       width: parseInt(width),
+      upscale: upscale ? upscale : "",
       sampler: "DPM++ 2M Karras",
       seed: -1,
       negative_prompt: negativePrompt ? negativePrompt.trim() : "",
