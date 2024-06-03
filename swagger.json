@@ -224,7 +224,7 @@
     "/api/v1/styleSheet": {
       "get": {
         "tags": [
-          "Check Style"
+          "Check Style Presets"
         ],
         "summary": "Get Available Style Presets",
         "description": "Endpoint to get the available style presets for image generation.",
