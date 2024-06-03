@@ -92,7 +92,7 @@
             "description": "The model to use for image generation.",
             "schema": {
               "type": "string",
-              "default": "absolutereality_v181.safetensors [3d9d4d2b]"
+              "default": "Absolute Reality V16"
             }
           },
           {
