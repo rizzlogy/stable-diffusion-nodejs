@@ -148,13 +148,13 @@ app.get("/api/v1/generateImage", async (req, res) => {
   }
 
   // Validate height and width
-  const validHeight = !isNaN(height) && height > 0 && height <= 2048;
-  const validWidth = !isNaN(width) && width > 0 && width <= 2048;
+  const validHeight = !isNaN(height) && height > 0 && height <= 1024;
+  const validWidth = !isNaN(width) && width > 0 && width <= 1024;
 
   if (!validHeight || !validWidth) {
-    console.log("Invalid height or width. Please provide values between 1 and 2048.");
+    console.log("Invalid height or width. Please provide values between 1 and 1024.");
     return res.status(400).json({
-      content: "Invalid height or width. Please provide values between 1 and 2048.",
+      content: "Invalid height or width. Please provide values between 1 and 1024.",
       status: 400,
       creator: `${config.Setup.apiName} - ${config.Setup.creator}`,
     });
