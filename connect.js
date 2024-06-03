@@ -125,14 +125,12 @@ app.get("/api/v1/generateImage", async (req, res) => {
     }
 
     const typeModelLowerCase = typeModel.toLowerCase();
+    const modelLowerCase = model.toLowerCase();
 
-    const mappedModel = config.Model[`validModels${typeModelLowerCase === 'sdxl' ? 'SDXL' : 'Default'}`][model.toLowerCase()];
+    const mappedModel = config.Model[`validModels${typeModelLowerCase === 'sdxl' ? 'SDXL' : 'Default'}`][modelLowerCase];
     const mappedStylePreset = stylePreset ? config.Model.validStylePresets[stylePreset.toLowerCase()] : null;
 
-    if (
-        (typeModelLowerCase === "sdxl" && !mappedModel) ||
-        (typeModelLowerCase === "default" && !mappedModel)
-    ) {
+    if (!mappedModel) {
         const validModels = typeModelLowerCase === "sdxl" ? "SDXL" : "default";
         console.log(chalk.yellow(`Invalid model for ${validModels}. Please choose a valid ${validModels} model. See list of models in '/api/v1/models'.`));
         return res.status(400).json({
