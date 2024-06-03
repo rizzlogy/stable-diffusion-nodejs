@@ -180,6 +180,7 @@ app.get("/api/v1/generateImage", async (req, res) => {
       width: parseInt(width),
       sampler: "DPM++ 2M Karras",
       seed: -1,
+      cfg_scale: 7,
       negative_prompt: negativePrompt ? negativePrompt.trim() : "",
       steps: 20,
     });
