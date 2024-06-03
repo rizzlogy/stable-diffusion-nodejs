@@ -153,9 +153,9 @@ app.get("/api/v1/generateImage", async (req, res) => {
     const generateFunc = typeModelLowerCase === "sdxl" ? generateImageSDXL : generateImage;
     
     // Logging parameters before calling generateFunc
-    console.log('Parameters passed to generateFunc:', { prompt, model, stylePreset, height, width, upscale });
+    console.log('Parameters passed to generateFunc:', { prompt, model, stylePreset, height, width,  });
 
-    const result = await generateFunc({ prompt, model, style_preset: stylePreset, height, width, upscale });
+    const result = await generateFunc({ prompt.trim(), model.trim(), style_preset: stylePreset.trim(), height, width, sampler: "DPM++ 2M Karras" });
     const { status, imageUrl } = await wait(result);
 
     if (status === "failed") {
