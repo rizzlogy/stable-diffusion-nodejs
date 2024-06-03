@@ -73,6 +73,19 @@
             }
           },
           {
+            "name": "upscale",
+            "in": "query",
+            "required": true,
+            "description": "The image upscale of model.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "false",
+                "true"
+              ]
+            }
+          },
+          {
             "name": "model",
             "in": "query",
             "required": true,
