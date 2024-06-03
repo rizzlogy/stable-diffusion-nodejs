@@ -102,7 +102,7 @@ app.get("/api/v1/models", (req, res) => {
 app.get("/api/v1/generateImage", async (req, res) => {
     console.log(chalk.blue("Received request for /api/v1/generateImage"));
 
-    let { prompt, model, typeModel, stylePreset, height, width, negativePrompt, upscale } = req.query;
+    const { prompt, model, typeModel, stylePreset, height, width, negativePrompt, upscale } = req.query;
 
     console.log(chalk.blue("Incoming parameters:"), {
         prompt,
@@ -125,12 +125,11 @@ app.get("/api/v1/generateImage", async (req, res) => {
     }
 
     const typeModelLowerCase = typeModel.toLowerCase();
-    const modelLowerCase = model.toLowerCase();
 
-    const mappedModel = config.Model[`validModels${typeModelLowerCase === 'sdxl' ? 'SDXL' : 'Default'}`][modelLowerCase];
-    const mappedStylePreset = stylePreset ? config.Model.validStylePresets[stylePreset.toLowerCase()] : null;
-
-    if (!mappedModel) {
+    if (
+        (typeModelLowerCase === "sdxl" && !config.Model.validModelsSDXL.hasOwnProperty(model)) ||
+        (typeModelLowerCase === "default" && !config.Model.validModelsDefault.hasOwnProperty(model))
+    ) {
         const validModels = typeModelLowerCase === "sdxl" ? "SDXL" : "default";
         console.log(chalk.yellow(`Invalid model for ${validModels}. Please choose a valid ${validModels} model. See list of models in '/api/v1/models'.`));
         return res.status(400).json({
@@ -140,7 +139,7 @@ app.get("/api/v1/generateImage", async (req, res) => {
         });
     }
 
-    if (stylePreset && !mappedStylePreset) {
+    if (stylePreset && !config.Model.validStylePresets.hasOwnProperty(stylePreset)) {
         console.log(chalk.yellow("Invalid style preset. Please choose a valid style preset."));
         return res.status(400).json({
             content: "Invalid style preset. Please choose a valid style preset.",
@@ -149,6 +148,7 @@ app.get("/api/v1/generateImage", async (req, res) => {
         });
     }
 
+    // Validate height and width
     const validHeight = !isNaN(height) && height > 0 && height <= 1024;
     const validWidth = !isNaN(width) && width > 0 && width <= 1024;
 
@@ -161,22 +161,13 @@ app.get("/api/v1/generateImage", async (req, res) => {
         });
     }
 
-    if (upscale && upscale !== "true" && upscale !== "false") {
-        console.log(chalk.yellow("Invalid upscale value. Please provide 'true' atau 'false'."));
-        return res.status(400).json({
-            content: "Invalid upscale value. Please provide 'true' atau 'false'.",
-            status: 400,
-            creator: `${config.Setup.apiName} - ${config.Setup.creator}`,
-        });
-    }
-
     try {
         const generateFunc = typeModelLowerCase === "sdxl" ? generateImageSDXL : generateImage;
 
         const result = await generateFunc({
             prompt: prompt.trim(),
-            model: mappedModel,
-            style_preset: mappedStylePreset || "",
+            model: config.Model[`validModels${typeModelLowerCase === 'sdxl' ? 'SDXL' : 'Default'}`][model],
+            style_preset: stylePreset ? config.Model.validStylePresets[stylePreset] : undefined,
             height: parseInt(height),
             width: parseInt(width),
             sampler: "DPM++ 2M Karras",
@@ -190,11 +181,11 @@ app.get("/api/v1/generateImage", async (req, res) => {
         console.log(chalk.blue('Parameters passed to generateFunc:'), {
             prompt: prompt.trim(),
             negativePrompt: negativePrompt ? negativePrompt.trim() : "",
-            model: mappedModel,
-            stylePreset: mappedStylePreset || "",
+            model: config.Model[`validModels${typeModelLowerCase === 'sdxl' ? 'SDXL' : 'Default'}`][model],
+            stylePreset: stylePreset ? config.Model.validStylePresets[stylePreset] : undefined,
             height,
             width,
-            upscale,
+            upscale: upscale === "true",
         });
 
         const { status, imageUrl } = await wait(result);
