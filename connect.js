@@ -126,9 +126,12 @@ app.get("/api/v1/generateImage", async (req, res) => {
 
     const typeModelLowerCase = typeModel.toLowerCase();
 
+    const mappedModel = config.Model[`validModels${typeModelLowerCase === 'sdxl' ? 'SDXL' : 'Default'}`][model];
+    const mappedStylePreset = stylePreset ? config.Model.validStylePresets[stylePreset] : null;
+
     if (
-        (typeModelLowerCase === "sdxl" && !config.Model.validModelsSDXL.hasOwnProperty(model.toLowerCase())) ||
-        (typeModelLowerCase === "default" && !config.Model.validModelsDefault.hasOwnProperty(model.toLowerCase()))
+        (typeModelLowerCase === "sdxl" && !mappedModel) ||
+        (typeModelLowerCase === "default" && !mappedModel)
     ) {
         const validModels = typeModelLowerCase === "sdxl" ? "SDXL" : "default";
         console.log(chalk.yellow(`Invalid model for ${validModels}. Please choose a valid ${validModels} model. See list of models in '/api/v1/models'.`));
@@ -139,7 +142,7 @@ app.get("/api/v1/generateImage", async (req, res) => {
         });
     }
 
-    if (stylePreset && !config.Model.validStylePresets.hasOwnProperty(stylePreset.toLowerCase())) {
+    if (stylePreset && !mappedStylePreset) {
         console.log(chalk.yellow("Invalid style preset. Please choose a valid style preset."));
         return res.status(400).json({
             content: "Invalid style preset. Please choose a valid style preset.",
@@ -148,7 +151,6 @@ app.get("/api/v1/generateImage", async (req, res) => {
         });
     }
 
-    // Validate height and width
     const validHeight = !isNaN(height) && height > 0 && height <= 1024;
     const validWidth = !isNaN(width) && width > 0 && width <= 1024;
 
@@ -161,33 +163,22 @@ app.get("/api/v1/generateImage", async (req, res) => {
         });
     }
 
-    // Validate upscale
     if (upscale && upscale !== "true" && upscale !== "false") {
-        console.log(chalk.yellow("Invalid upscale value. Please provide 'true' or 'false'."));
+        console.log(chalk.yellow("Invalid upscale value. Please provide 'true' atau 'false'."));
         return res.status(400).json({
-            content: "Invalid upscale value. Please provide 'true' or 'false'.",
+            content: "Invalid upscale value. Please provide 'true' atau 'false'.",
             status: 400,
             creator: `${config.Setup.apiName} - ${config.Setup.creator}`,
         });
     }
 
     try {
-        var result = typeModelLowerCase === "sdxl" ? generateImageSDXL({
+        const generateFunc = typeModelLowerCase === "sdxl" ? generateImageSDXL : generateImage;
+
+        const result = await generateFunc({
             prompt: prompt.trim(),
-            model: config.Model.validModelsSDXL[model.toLowerCase()],
-            style_preset: stylePreset ? config.Model.validStylePresets[stylePreset.toLowerCase()] : "",
-            height: parseInt(height),
-            width: parseInt(width),
-            sampler: "DPM++ 2M Karras",
-            seed: -1,
-            cfg_scale: 7,
-            negative_prompt: negativePrompt ? negativePrompt.trim() : "",
-            steps: 20,
-            upscale: upscale === "true",
-        }) : generateImage({
-            prompt: prompt.trim(),
-            model: config.Model.validModelsDefault[model.toLowerCase()],
-            style_preset: stylePreset ? config.Model.validStylePresets[stylePreset.toLowerCase()] : "",
+            model: mappedModel,
+            style_preset: mappedStylePreset || "",
             height: parseInt(height),
             width: parseInt(width),
             sampler: "DPM++ 2M Karras",
@@ -201,8 +192,8 @@ app.get("/api/v1/generateImage", async (req, res) => {
         console.log(chalk.blue('Parameters passed to generateFunc:'), {
             prompt: prompt.trim(),
             negativePrompt: negativePrompt ? negativePrompt.trim() : "",
-            model: config.Model.validModelsDefault[model],
-            stylePreset: stylePreset ? config.Model.validStylePresets[stylePreset] : "",
+            model: mappedModel,
+            stylePreset: mappedStylePreset || "",
             height,
             width,
             upscale,
