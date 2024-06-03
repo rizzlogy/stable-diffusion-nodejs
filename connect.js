@@ -126,8 +126,8 @@ app.get("/api/v1/generateImage", async (req, res) => {
 
     const typeModelLowerCase = typeModel.toLowerCase();
 
-    const mappedModel = config.Model[`validModels${typeModelLowerCase === 'sdxl' ? 'SDXL' : 'Default'}`][model];
-    const mappedStylePreset = stylePreset ? config.Model.validStylePresets[stylePreset] : null;
+    const mappedModel = config.Model[`validModels${typeModelLowerCase === 'sdxl' ? 'SDXL' : 'Default'}`][model.toLowerCase()];
+    const mappedStylePreset = stylePreset ? config.Model.validStylePresets[stylePreset.toLowerCase()] : null;
 
     if (
         (typeModelLowerCase === "sdxl" && !mappedModel) ||
