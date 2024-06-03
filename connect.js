@@ -101,7 +101,7 @@ app.get("/api/v1/models", (req, res) => {
 app.get("/api/v1/generateImage", async (req, res) => {
   console.log("Received request for /api/v1/generateImage");
 
-  const { prompt, model, typeModel, stylePreset, height, width, upscale, negativePrompt } = req.query;
+  const { prompt, model, typeModel, stylePreset, height, width, negativePrompt } = req.query;
 
   // Log all incoming parameters
   console.log("Incoming parameters:", {
@@ -112,7 +112,6 @@ app.get("/api/v1/generateImage", async (req, res) => {
     stylePreset,
     height,
     width,
-    upscale
   });
 
   if (!prompt || !model || !typeModel) {
@@ -179,7 +178,6 @@ app.get("/api/v1/generateImage", async (req, res) => {
       style_preset: stylePreset ? stylePreset.trim() : "",
       height: parseInt(height),
       width: parseInt(width),
-      upscale: upscale ? upscale : "",
       sampler: "DPM++ 2M Karras",
       seed: -1,
       negative_prompt: negativePrompt ? negativePrompt.trim() : "",
