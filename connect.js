@@ -101,7 +101,7 @@ app.get("/api/v1/models", (req, res) => {
 app.get("/api/v1/generateImage", async (req, res) => {
     console.log(chalk.blue("Received request for /api/v1/generateImage"));
 
-    const { prompt, model, typeModel, stylePreset, height, width, negativePrompt } = req.query;
+    const { prompt, model, typeModel, stylePreset = "", height, width, negativePrompt = "" } = req.query;
 
     console.log(chalk.blue("Incoming parameters:"), {
         prompt,
