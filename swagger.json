@@ -18,15 +18,15 @@
   ],
   "tags": [
     {
-      "name": "API AI",
+      "name": "Stablediff.",
       "description": "Endpoints related to generating images using AI"
     },
     {
-      "name": "Check Models",
+      "name": "Models.",
       "description": "Endpoints to check available models for image generation"
     },
     {
-      "name": "Check Style Presets",
+      "name": "Style Presets.",
       "description": "Endpoints to check available style presets for image generation"
     }
   ],
@@ -34,7 +34,7 @@
     "/api/v1/generateImage": {
       "get": {
         "tags": [
-          "API AI"
+          "Stablediff."
         ],
         "summary": "Generate Image from Text Prompt",
         "description": "Endpoint to generate an image based on the provided text prompt and other parameters.",
@@ -186,7 +186,7 @@
     "/api/v1/models": {
       "get": {
         "tags": [
-          "Check Models"
+          "Models."
         ],
         "summary": "Get Available Models",
         "description": "Endpoint to get the available models for image generation.",
@@ -205,14 +205,12 @@
                           "type": "array",
                           "items": {
                             "type": "string",
-                            "example": "absolutereality_v181.safetensors [3d9d4d2b]"
                           }
                         },
                         "sdxl": {
                           "type": "array",
                           "items": {
                             "type": "string",
-                            "example": "sd_xl_base_1.0.safetensors [be9edd61]"
                           }
                         }
                       }
@@ -236,7 +234,7 @@
     "/api/v1/styleSheet": {
       "get": {
         "tags": [
-          "Check Style Presets"
+          "Style Presets."
         ],
         "summary": "Get Available Style Presets",
         "description": "Endpoint to get the available style presets for image generation.",
