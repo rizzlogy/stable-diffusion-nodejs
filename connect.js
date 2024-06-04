@@ -17,11 +17,11 @@ const PORT = process.env.PORT || 4000;
 
 app.set("json spaces", 2);
 app.set("trust proxy", true);
-
+app.enable("trust proxy");
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cors());
 app.use(swaggerUi.serve);
+app.use(cors());
 
 function formatBytes(bytes, decimals = 2) {
   if (bytes === 0) return "0 Bytes";
@@ -73,17 +73,16 @@ app.use(
 app.get("/", async (req, res) => {
   swaggerDocument.host = req.get("host");
   swaggerDocument.schemes = ["https"];
-  const customCss = [
-    `.swagger-ui .topbar .download-url-wrapper { display: none }
-     .swagger-ui .topbar-wrapper img[alt="Stable Diffusion API"], .topbar-wrapper span { visibility: collapse; }
-     .swagger-ui .topbar-wrapper img { content: url("https://i.ibb.co.com/F6CS4fP/Tak-berjudul2-20240604073140.png"); }
-     .swagger-ui .opblock-section-body .parameters-col_description { width: 50px; }
-     .swagger-ui .response-col_links { display: none; }`,
-    await theme.getBuffer(SwaggerThemeNameEnum.DARK),
-  ].join("\n");
   res.send(
     swaggerUi.generateHTML(swaggerDocument, {
-      customCss,
+      customCss: [
+        `.swagger-ui .topbar .download-url-wrapper { display: none } 
+                        .swagger-ui .topbar-wrapper img[alt="Stable Diffusion API"], .topbar-wrapper span { visibility: collapse; }
+                        .swagger-ui .topbar-wrapper img { content: url("https://i.ibb.co.com/F6CS4fP/Tak-berjudul2-20240604073140.png"); }
+                        .swagger-ui .opblock-section-body .parameters-col_description { width: 50px; }
+                        .swagger-ui .response-col_links { display: none; }`,
+        await theme.getBuffer(SwaggerThemeNameEnum.DARK),
+      ],
       customfavIcon:
         "https://i.ib.co.com/878zHng/Tak-berjudul4-20240604073614.png",
       customSiteTitle: swaggerDocument.info.title,
@@ -98,9 +97,19 @@ app.get("/swagger.json", (req, res) => {
   res.json(swaggerDocument);
 });
 
-app.get("/api/v1/generateImage", async (req, res) => {
-  console.log(chalk.blue("Received request for /api/v1/generateImage"));
+app.get("/api/v1/models", (req, res) => {
+  res.status(200).json({
+    Model: {
+      default: Object.keys(config.Model.validModelsDefault),
+      sdxl: Object.keys(config.Model.validModelsSDXL),
+      stylePresets: Object.keys(config.Model.validStylePresets),
+    },
+    status: 200,
+    creator: `${config.Setup.apiName} - ${config.Setup.creator}`,
+  });
+});
 
+app.get("/api/v1/generateImage", async (req, res) => {
   const {
     prompt,
     model,
@@ -112,18 +121,6 @@ app.get("/api/v1/generateImage", async (req, res) => {
     upscale,
     view,
   } = req.query;
-
-  console.log(chalk.blue("Incoming parameters:"), {
-    prompt,
-    negativePrompt,
-    model,
-    typeModel,
-    stylePreset,
-    height,
-    width,
-    upscale,
-    view,
-  });
 
   if (!prompt || !model || !typeModel) {
     console.log(
@@ -140,17 +137,20 @@ app.get("/api/v1/generateImage", async (req, res) => {
   }
 
   const typeModelLowerCase = typeModel.toLowerCase();
-  const validModelKey =
-    typeModelLowerCase === "sdxl" ? "validModelsSDXL" : "validModelsDefault";
 
-  if (!config.Model[validModelKey][model]) {
+  if (
+    !config.Model[
+      `validModels${typeModelLowerCase === "sdxl" ? "SDXL" : "Default"}`
+    ][model]
+  ) {
+    const validModels = typeModelLowerCase === "sdxl" ? "SDXL" : "default";
     console.log(
       chalk.yellow(
-        `Invalid model for ${typeModelLowerCase}. Please choose a valid model.`,
+        `Invalid model for ${validModels}. Please choose a valid ${validModels} model. See list of models in '/api/v1/models'.`,
       ),
     );
     return res.status(400).json({
-      content: `Invalid model for ${typeModelLowerCase}. Please choose a valid model.`,
+      content: `Invalid model for ${validModels}. Please choose a valid ${validModels} model. See list of models in '/api/v1/models'.`,
       status: 400,
       creator: `${config.Setup.apiName} - ${config.Setup.creator}`,
     });
@@ -167,6 +167,7 @@ app.get("/api/v1/generateImage", async (req, res) => {
     });
   }
 
+  // Validate height and width
   const validHeight = !isNaN(height) && height > 0 && height <= 1024;
   const validWidth = !isNaN(width) && width > 0 && width <= 1024;
 
@@ -184,6 +185,7 @@ app.get("/api/v1/generateImage", async (req, res) => {
     });
   }
 
+  // Validate upscale
   if (upscale && upscale !== "true" && upscale !== "false") {
     console.log(
       chalk.yellow("Invalid upscale value. Please provide 'true' or 'false'."),
@@ -195,6 +197,7 @@ app.get("/api/v1/generateImage", async (req, res) => {
     });
   }
 
+  // Validate view code
   if (view && view.toLowerCase() !== "json" && view.toLowerCase() !== "image") {
     console.log(
       chalk.yellow("Invalid view value. Please provide 'json' or 'image'."),
@@ -209,20 +212,13 @@ app.get("/api/v1/generateImage", async (req, res) => {
   try {
     const generateFunc =
       typeModelLowerCase === "sdxl" ? generateImageSDXL : generateImage;
-    const typeModelConfig = config.Model[validModelKey][model];
+    const typeModelConfig =
+      config.Model[
+        `validModels${typeModelLowerCase === "sdxl" ? "SDXL" : "Default"}`
+      ][model];
     const stylePresetConfig = stylePreset
       ? config.Model.validStylePresets[stylePreset]
       : "";
-
-    console.log(chalk.blue("Parameters passed to generateFunc:"), {
-      prompt: prompt.trim(),
-      negativePrompt: negativePrompt ? negativePrompt.trim() : "",
-      model: typeModelConfig.trim(),
-      stylePreset: stylePresetConfig.trim(),
-      height,
-      width,
-      upscale: upscale,
-    });
 
     const result = await generateFunc({
       prompt: prompt.trim(),
@@ -235,7 +231,7 @@ app.get("/api/v1/generateImage", async (req, res) => {
       cfg_scale: 7,
       negative_prompt: negativePrompt ? negativePrompt.trim() : "",
       steps: 20,
-      upscale: upscale === "true",
+      upscale: upscale,
     });
 
     const { status, imageUrl } = await wait(result);
@@ -250,7 +246,6 @@ app.get("/api/v1/generateImage", async (req, res) => {
     }
 
     if (view.toLowerCase() === "json") {
-      console.log(chalk.green("Image sent successfully"));
       return res.status(200).json({
         result: imageUrl,
         status: 200,
@@ -271,7 +266,7 @@ app.get("/api/v1/generateImage", async (req, res) => {
         "Content-Disposition",
         `inline; filename="TextToImage-${randomFilename}.png"`,
       );
-      console.log(chalk.green("Image sent successfully"));
+
       return res.status(200).send(Buffer.from(response.data, "binary"));
     }
   } catch (e) {
@@ -284,32 +279,21 @@ app.get("/api/v1/generateImage", async (req, res) => {
     return res.status(500).json({
       content: "Internal Server Error",
       status: 500,
+      error: e.message,
       creator: `${config.Setup.apiName} - ${config.Setup.creator}`,
     });
   }
 });
 
-app.get("/api/v1/models", (req, res) => {
-  res.status(200).json({
-    Model: {
-      default: Object.keys(config.Model.validModelsDefault),
-      sdxl: Object.keys(config.Model.validModelsSDXL),
-      stylePresets: Object.keys(config.Model.validStylePresets),
-    },
-    status: 200,
-    creator: `${config.Setup.apiName} - ${config.Setup.creator}`,
-  });
-});
-
 app.get("/api/v1/styleSheet", (req, res) => {
   res.status(200).json({
-    stylePresets: Object.keys(config.Model.validStylePresets),
+    stylePresets: config.Model.validStylePresets,
     status: 200,
     creator: `${config.Setup.apiName} - ${config.Setup.creator}`,
   });
 });
 
-app.use((req, res) => {
+app.use((req, res, next) => {
   res.status(404).json({
     content: "Not Found!",
     status: 404,
