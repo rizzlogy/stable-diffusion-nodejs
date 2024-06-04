@@ -164,7 +164,7 @@ app.get("/api/v1/generateImage", async (req, res) => {
     }
 
     // Validate view code
-    if (view && view.toLowerCase() !== "json" && upscale !== "image") {
+    if (view && view.toLowerCase() !== "json" && view.toLowerCase() !== "image") {
         console.log(chalk.yellow("Invalid view value. Please provide 'json' or 'image'."));
         return res.status(400).json({
             content: "Invalid view value. Please provide 'json' or 'image'.",
