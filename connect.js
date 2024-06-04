@@ -248,13 +248,11 @@ app.get("/api/v1/generateImage", async (req, res) => {
     }
 
     if (view.toLowerCase() === "json") {
-      return res
-        .status(200)
-        .json({
-          result: imageUrl,
-          status: 200,
-          creator: `${config.Setup.apiName} - ${config.Setup.creator}`,
-        });
+      return res.status(200).json({
+        result: imageUrl,
+        status: 200,
+        creator: `${config.Setup.apiName} - ${config.Setup.creator}`,
+      });
     } else if (view.toLowerCase() === "image") {
       const response = await axios.get(imageUrl, {
         responseType: "arraybuffer",
