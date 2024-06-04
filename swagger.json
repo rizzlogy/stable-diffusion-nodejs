@@ -119,8 +119,8 @@
           {
             "name": "view",
             "in": "query",
-            "required": false,
-            "description": "Response format (json or image).",
+            "required": true,
+            "description": "Response format.",
             "schema": {
               "type": "string",
               "enum": ["json", "image"]
@@ -135,9 +135,17 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "imageUrl": {
+                    "result": {
                       "type": "string",
-                      "example": "https://example.com/image.png"
+                      "example": "https://images.prodia.xyz/1992a4f8-20c7-4e33-8e42-26a44fa592b6.png",
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "creator": {
+                      "type": "string",
+                      "example": "Stable Diffusion - ©RizzyFuzz & FastURL"
                     }
                   }
                 }
