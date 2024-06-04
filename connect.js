@@ -12,7 +12,7 @@ const swaggerDocument = require('./swagger.json');
 const { generateImage, generateImageSDXL, wait } = Prodia(config.Setup.key);
 const { SwaggerTheme, SwaggerThemeNameEnum } = require('swagger-themes');
 const theme = new SwaggerTheme();
-const darkStyle = theme.getBuffer(SwaggerThemeNameEnum.DARK);
+const darkStyle = theme.getBuffer(SwaggerThemeNameEnum.DRACULA);
 
 const app = express();
 const PORT = process.env.PORT || 4000;
