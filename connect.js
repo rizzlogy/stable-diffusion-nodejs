@@ -64,10 +64,10 @@ app.use(
       formatBytes(
         isNaN(tokens.res(req, res, "content-length"))
           ? 0
-          : tokens.res(req, res, "content-length"),
+          : tokens.res(req, res, "content-length")
       ),
-    ].join(" | "),
-  ),
+    ].join(" | ")
+  )
 );
 
 app.get("/", async (req, res) => {
@@ -84,11 +84,10 @@ app.get("/", async (req, res) => {
   res.send(
     swaggerUi.generateHTML(swaggerDocument, {
       customCss,
-      customfavIcon:
-        "https://i.ib.co.com/878zHng/Tak-berjudul4-20240604073614.png",
+      customfavIcon: "https://i.ib.co.com/878zHng/Tak-berjudul4-20240604073614.png",
       customSiteTitle: swaggerDocument.info.title,
       customSiteDesc: swaggerDocument.info.description,
-    }),
+    })
   );
 });
 
@@ -128,8 +127,8 @@ app.get("/api/v1/generateImage", async (req, res) => {
   if (!prompt || !model || !typeModel) {
     console.log(
       chalk.yellow(
-        "Missing parameters. Please provide prompt, model, and typeModel.",
-      ),
+        "Missing parameters. Please provide prompt, model, and typeModel."
+      )
     );
     return res.status(400).json({
       content:
@@ -146,8 +145,8 @@ app.get("/api/v1/generateImage", async (req, res) => {
   if (!config.Model[validModelKey][model]) {
     console.log(
       chalk.yellow(
-        `Invalid model for ${typeModelLowerCase}. Please choose a valid model.`,
-      ),
+        `Invalid model for ${typeModelLowerCase}. Please choose a valid model.`
+      )
     );
     return res.status(400).json({
       content: `Invalid model for ${typeModelLowerCase}. Please choose a valid model.`,
@@ -158,7 +157,7 @@ app.get("/api/v1/generateImage", async (req, res) => {
 
   if (stylePreset && !config.Model.validStylePresets[stylePreset]) {
     console.log(
-      chalk.yellow("Invalid style preset. Please choose a valid style preset."),
+      chalk.yellow("Invalid style preset. Please choose a valid style preset.")
     );
     return res.status(400).json({
       content: "Invalid style preset. Please choose a valid style preset.",
@@ -173,8 +172,8 @@ app.get("/api/v1/generateImage", async (req, res) => {
   if (!validHeight || !validWidth) {
     console.log(
       chalk.yellow(
-        "Invalid height or width. Please provide values between 1 and 1024.",
-      ),
+        "Invalid height or width. Please provide values between 1 and 1024."
+      )
     );
     return res.status(400).json({
       content:
@@ -186,7 +185,7 @@ app.get("/api/v1/generateImage", async (req, res) => {
 
   if (upscale && upscale !== "true" && upscale !== "false") {
     console.log(
-      chalk.yellow("Invalid upscale value. Please provide 'true' or 'false'."),
+      chalk.yellow("Invalid upscale value. Please provide 'true' or 'false'.")
     );
     return res.status(400).json({
       content: "Invalid upscale value. Please provide 'true' or 'false'.",
@@ -197,7 +196,7 @@ app.get("/api/v1/generateImage", async (req, res) => {
 
   if (view && view.toLowerCase() !== "json" && view.toLowerCase() !== "image") {
     console.log(
-      chalk.yellow("Invalid view value. Please provide 'json' or 'image'."),
+      chalk.yellow("Invalid view value. Please provide 'json' or 'image'.")
     );
     return res.status(400).json({
       content: "Invalid view value. Please provide 'json' or 'image'.",
@@ -235,7 +234,7 @@ app.get("/api/v1/generateImage", async (req, res) => {
       cfg_scale: 7,
       negative_prompt: negativePrompt ? negativePrompt.trim() : "",
       steps: 20,
-      upscale: upscale,
+      upscale: upscale === "true",
     });
 
     const { status, imageUrl } = await wait(result);
@@ -261,15 +260,12 @@ app.get("/api/v1/generateImage", async (req, res) => {
         responseType: "arraybuffer",
       });
 
-      const randomFilename = crypto
-        .randomBytes(15)
-        .toString("hex")
-        .toUpperCase();
+      const randomFilename = crypto.randomBytes(15).toString("hex").toUpperCase();
 
       res.set("Content-Type", "image/png");
       res.set(
         "Content-Disposition",
-        `inline; filename="TextToImage-${randomFilename}.png"`,
+        `inline; filename="TextToImage-${randomFilename}.png"`
       );
       console.log(chalk.green("Image sent successfully"));
       return res.status(200).send(Buffer.from(response.data, "binary"));
