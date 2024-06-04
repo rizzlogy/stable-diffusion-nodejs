@@ -193,8 +193,7 @@ app.get("/api/v1/generateImage", async (req, res) => {
 
         if (view === 'json') {
             return res.status(200).json({ result: imageUrl, status: 200, creator: `${config.Setup.apiName} - ${config.Setup.creator}` });
-        }
-
+        } else if (view === 'image') {
         const response = await axios.get(imageUrl, { responseType: "arraybuffer" });
 
         const randomFilename = crypto.randomBytes(15).toString("hex").toUpperCase();
@@ -203,6 +202,14 @@ app.get("/api/v1/generateImage", async (req, res) => {
         res.set("Content-Disposition", `inline; filename="TextToImage-${randomFilename}.png"`);
 
         res.status(200).send(Buffer.from(response.data, "binary"));
+    } else {
+            console.log(chalk.yellow("Invalid upscale value. Please provide 'json' or 'image'."));
+        return res.status(400).json({
+            content: "Invalid view value. Please provide 'json' or 'image'.",
+            status: 400,
+            creator: `${config.Setup.apiName} - ${config.Setup.creator}`,
+        });
+        }
         console.log(chalk.green("Image sent successfully"));
     } catch (e) {
         console.error(chalk.red("Error occurred:"), e.message);
