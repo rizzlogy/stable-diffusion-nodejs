@@ -12,8 +12,6 @@ const swaggerDocument = require('./swagger.json');
 const { generateImage, generateImageSDXL, wait } = Prodia(config.Setup.key);
 const { SwaggerTheme, SwaggerThemeNameEnum } = require('swagger-themes');
 const theme = new SwaggerTheme();
-const darkStyle = theme.getBuffer(SwaggerThemeNameEnum.DRACULA);
-
 const app = express();
 const PORT = process.env.PORT || 4000;
 
@@ -71,12 +69,13 @@ app.get("/", (req, res) => {
     swaggerDocument.schemes = ["https"];
     res.send(
         swaggerUi.generateHTML(swaggerDocument, {
-            customCss: [`.swagger-ui .topbar .download-url-wrapper { display: none } 
+            customCss: [
+                `.swagger-ui .topbar .download-url-wrapper { display: none } 
                         .swagger-ui .topbar-wrapper img[alt="Stable Diffusion API"], .topbar-wrapper span { visibility: collapse; }
                         .swagger-ui .topbar-wrapper img { content: url("https://i.ibb.co.com/F6CS4fP/Tak-berjudul2-20240604073140.png"); }
                         .swagger-ui .opblock-section-body .parameters-col_description { width: 50px; }
                         .swagger-ui .response-col_links { display: none; }`,
-                        darkStyle
+                        await theme.getBuffer(SwaggerThemeNameEnum.DARK)
             ],
             customfavIcon: "https://i.ibb.co.com/878zHng/Tak-berjudul4-20240604073614.png",
             customSiteTitle: swaggerDocument.info.title,
@@ -107,18 +106,6 @@ app.get("/api/v1/generateImage", async (req, res) => {
     console.log(chalk.blue("Received request for /api/v1/generateImage"));
 
     const { prompt, model, typeModel, stylePreset, height, width, negativePrompt, upscale, view } = req.query;
-
-    console.log(chalk.blue("Incoming parameters:"), {
-        prompt,
-        negativePrompt,
-        model,
-        typeModel,
-        stylePreset,
-        height,
-        width,
-        upscale,
-        view,
-    });
 
     if (!prompt || !model || !typeModel) {
         console.log(chalk.yellow("Missing parameters. Please provide prompt, model, and typeModel."));
@@ -166,6 +153,16 @@ app.get("/api/v1/generateImage", async (req, res) => {
         });
     }
 
+    // Validate upscale
+    if (upscale && upscale !== "true" && upscale !== "false") {
+        console.log(chalk.yellow("Invalid upscale value. Please provide 'true' or 'false'."));
+        return res.status(400).json({
+            content: "Invalid upscale value. Please provide 'true' or 'false'.",
+            status: 400,
+            creator: `${config.Setup.apiName} - ${config.Setup.creator}`,
+        });
+    }
+
     try {
         const generateFunc = typeModelLowerCase === "sdxl" ? generateImageSDXL : generateImage;
 
@@ -180,17 +177,7 @@ app.get("/api/v1/generateImage", async (req, res) => {
             cfg_scale: 7,
             negative_prompt: negativePrompt ? negativePrompt.trim() : "",
             steps: 20,
-            upscale: upscale === "true",
-        });
-
-        console.log(chalk.blue('Parameters passed to generateFunc:'), {
-            prompt: prompt.trim(),
-            negativePrompt: negativePrompt ? negativePrompt.trim() : "",
-            model: config.Model[`validModels${typeModelLowerCase === 'sdxl' ? 'SDXL' : 'Default'}`][model],
-            stylePreset: stylePreset ? config.Model.validStylePresets[stylePreset] : undefined,
-            height,
-            width,
-            upscale: upscale === "true",
+            upscale: upscale,
         });
 
         const { status, imageUrl } = await wait(result);
