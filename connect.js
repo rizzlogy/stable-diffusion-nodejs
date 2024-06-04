@@ -110,7 +110,7 @@ app.get("/api/v1/models", (req, res) => {
 });
 
 app.get("/api/v1/generateImage", async (req, res) => {
-  const {
+  let {
     prompt,
     model,
     typeModel,
