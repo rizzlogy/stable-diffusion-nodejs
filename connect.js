@@ -20,7 +20,7 @@ app.set("trust proxy", true);
 app.enable("trust proxy");
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use(swaggerUi.serve);
 app.use(cors());
 
 function formatBytes(bytes, decimals = 2) {
