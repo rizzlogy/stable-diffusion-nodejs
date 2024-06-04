@@ -224,7 +224,7 @@ app.get("/api/v1/generateImage", async (req, res) => {
           `validModels${typeModelLowerCase === "sdxl" ? "SDXL" : "Default"}`
         ][model],
       style_preset: stylePreset
-        ? config.Model.validStylePresets[stylePreset]
+        ? config.Model.validStylePresets[stylePreset.trim()]
         : "",
       height: parseInt(height),
       width: parseInt(width),
