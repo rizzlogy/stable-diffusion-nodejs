@@ -64,7 +64,7 @@ app.use(
     ].join(" | "))
 );
 
-app.get("/", (req, res) => {
+app.get("/", async (req, res) => {
     swaggerDocument.host = req.get("host");
     swaggerDocument.schemes = ["https"];
     res.send(
