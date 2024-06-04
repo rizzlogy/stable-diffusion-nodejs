@@ -110,8 +110,6 @@ app.get("/api/v1/models", (req, res) => {
 });
 
 app.get("/api/v1/generateImage", async (req, res) => {
-  console.log(chalk.blue("Received request for /api/v1/generateImage"));
-
   const {
     prompt,
     model,
@@ -227,7 +225,7 @@ app.get("/api/v1/generateImage", async (req, res) => {
         ][model],
       style_preset: stylePreset
         ? config.Model.validStylePresets[stylePreset]
-        : undefined,
+        : "",
       height: parseInt(height),
       width: parseInt(width),
       sampler: "DPM++ 2M Karras",
