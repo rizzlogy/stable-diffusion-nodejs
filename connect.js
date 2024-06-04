@@ -20,7 +20,7 @@ app.set("trust proxy", true);
 app.enable("trust proxy");
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(swaggerUi.serve);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(cors());
 
 function formatBytes(bytes, decimals = 2) {
@@ -102,7 +102,7 @@ app.get("/api/v1/models", (req, res) => {
 app.get("/api/v1/generateImage", async (req, res) => {
     console.log(chalk.blue("Received request for /api/v1/generateImage"));
 
-    const { prompt, model, typeModel, stylePreset, height, width, negativePrompt, upscale } = req.query;
+    const { prompt, model, typeModel, stylePreset, height, width, negativePrompt, upscale, view } = req.query;
 
     console.log(chalk.blue("Incoming parameters:"), {
         prompt,
@@ -113,6 +113,7 @@ app.get("/api/v1/generateImage", async (req, res) => {
         height,
         width,
         upscale,
+        view,
     });
 
     if (!prompt || !model || !typeModel) {
@@ -199,6 +200,10 @@ app.get("/api/v1/generateImage", async (req, res) => {
             });
         }
 
+        if (view === 'json') {
+            return res.status(200).json({ result: imageUrl, status: 200, creator: `${config.Setup.apiName} - ${config.Setup.creator}` });
+        }
+
         const response = await axios.get(imageUrl, { responseType: "arraybuffer" });
 
         const randomFilename = crypto.randomBytes(15).toString("hex").toUpperCase();
@@ -206,7 +211,7 @@ app.get("/api/v1/generateImage", async (req, res) => {
         res.set("Content-Type", "image/png");
         res.set("Content-Disposition", `inline; filename="TextToImage-${randomFilename}.png"`);
 
-        res.send(Buffer.from(response.data, "binary"));
+        res.status(200).send(Buffer.from(response.data, "binary"));
         console.log(chalk.green("Image sent successfully"));
     } catch (e) {
         console.error(chalk.red("Error occurred:"), e.message);
