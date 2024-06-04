@@ -9,8 +9,10 @@ const bodyParser = require("body-parser");
 const { Prodia } = require("prodia.js");
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger.json');
-
 const { generateImage, generateImageSDXL, wait } = Prodia(config.Setup.key);
+const { SwaggerTheme, SwaggerThemeNameEnum } = require('swagger-themes');
+const theme = new SwaggerTheme();
+const darkStyle = theme.getBuffer(SwaggerThemeNameEnum.DARK);
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -69,11 +71,13 @@ app.get("/", (req, res) => {
     swaggerDocument.schemes = ["https"];
     res.send(
         swaggerUi.generateHTML(swaggerDocument, {
-            customCss: `.swagger-ui .topbar .download-url-wrapper { display: none } 
+            customCss: [`.swagger-ui .topbar .download-url-wrapper { display: none } 
                         .swagger-ui .topbar-wrapper img[alt="Stable Diffusion API"], .topbar-wrapper span { visibility: collapse; }
                         .swagger-ui .topbar-wrapper img { content: url("https://i.ibb.co.com/F6CS4fP/Tak-berjudul2-20240604073140.png"); }
                         .swagger-ui .opblock-section-body .parameters-col_description { width: 50px; }
                         .swagger-ui .response-col_links { display: none; }`,
+                        darkStyle
+            ],
             customfavIcon: "https://i.ibb.co.com/878zHng/Tak-berjudul4-20240604073614.png",
             customSiteTitle: swaggerDocument.info.title,
             customSiteDesc: swaggerDocument.info.description,
