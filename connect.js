@@ -113,16 +113,16 @@ app.get("/api/v1/generateImage", async (req, res) => {
   } = req.query;
 
   console.log(chalk.blue("Incoming parameters:"), {
-        prompt,
-        negativePrompt,
-        model,
-        typeModel,
-        stylePreset,
-        height,
-        width,
-        upscale,
-       view,
-    });
+    prompt,
+    negativePrompt,
+    model,
+    typeModel,
+    stylePreset,
+    height,
+    width,
+    upscale,
+    view,
+  });
 
   if (!prompt || !model || !typeModel) {
     console.log(
@@ -222,15 +222,15 @@ app.get("/api/v1/generateImage", async (req, res) => {
       ? config.Model.validStylePresets[stylePreset]
       : "";
 
-    console.log(chalk.blue('Parameters passed to generateFunc:'), {
-            prompt: prompt.trim(),
-            negativePrompt: negativePrompt ? negativePrompt.trim() : "",
-            model: typeModelConfig.trim(),
-            stylePreset: stylePresetConfig.trim(),
-            height,
-            width,
-            upscale: upscale,
-        });
+    console.log(chalk.blue("Parameters passed to generateFunc:"), {
+      prompt: prompt.trim(),
+      negativePrompt: negativePrompt ? negativePrompt.trim() : "",
+      model: typeModelConfig.trim(),
+      stylePreset: stylePresetConfig.trim(),
+      height,
+      width,
+      upscale: upscale,
+    });
 
     const result = await generateFunc({
       prompt: prompt.trim(),
@@ -308,7 +308,6 @@ app.get("/api/v1/models", (req, res) => {
     creator: `${config.Setup.apiName} - ${config.Setup.creator}`,
   });
 });
-
 
 app.get("/api/v1/styleSheet", (req, res) => {
   res.status(200).json({
