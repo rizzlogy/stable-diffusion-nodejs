@@ -97,19 +97,9 @@ app.get("/swagger.json", (req, res) => {
   res.json(swaggerDocument);
 });
 
-app.get("/api/v1/models", (req, res) => {
-  res.status(200).json({
-    Model: {
-      default: Object.keys(config.Model.validModelsDefault),
-      sdxl: Object.keys(config.Model.validModelsSDXL),
-      stylePresets: Object.keys(config.Model.validStylePresets),
-    },
-    status: 200,
-    creator: `${config.Setup.apiName} - ${config.Setup.creator}`,
-  });
-});
-
 app.get("/api/v1/generateImage", async (req, res) => {
+  console.log(chalk.blue("Received request for /api/v1/generateImage"));
+
   const {
     prompt,
     model,
@@ -121,6 +111,18 @@ app.get("/api/v1/generateImage", async (req, res) => {
     upscale,
     view,
   } = req.query;
+
+  console.log(chalk.blue("Incoming parameters:"), {
+        prompt,
+        negativePrompt,
+        model,
+        typeModel,
+        stylePreset,
+        height,
+        width,
+        upscale,
+       view,
+    });
 
   if (!prompt || !model || !typeModel) {
     console.log(
@@ -220,6 +222,16 @@ app.get("/api/v1/generateImage", async (req, res) => {
       ? config.Model.validStylePresets[stylePreset]
       : "";
 
+    console.log(chalk.blue('Parameters passed to generateFunc:'), {
+            prompt: prompt.trim(),
+            negativePrompt: negativePrompt ? negativePrompt.trim() : "",
+            model: typeModelConfig.trim(),
+            stylePreset: stylePresetConfig.trim(),
+            height,
+            width,
+            upscale: upscale,
+        });
+
     const result = await generateFunc({
       prompt: prompt.trim(),
       model: typeModelConfig.trim(),
@@ -251,6 +263,7 @@ app.get("/api/v1/generateImage", async (req, res) => {
         status: 200,
         creator: `${config.Setup.apiName} - ${config.Setup.creator}`,
       });
+      console.log(chalk.green("Image sent successfully"));
     } else if (view.toLowerCase() === "image") {
       const response = await axios.get(imageUrl, {
         responseType: "arraybuffer",
@@ -266,8 +279,8 @@ app.get("/api/v1/generateImage", async (req, res) => {
         "Content-Disposition",
         `inline; filename="TextToImage-${randomFilename}.png"`,
       );
-
       return res.status(200).send(Buffer.from(response.data, "binary"));
+      console.log(chalk.green("Image sent successfully"));
     }
   } catch (e) {
     console.error(chalk.red("Error occurred:"), e.message);
@@ -279,15 +292,27 @@ app.get("/api/v1/generateImage", async (req, res) => {
     return res.status(500).json({
       content: "Internal Server Error",
       status: 500,
-      error: e.message,
       creator: `${config.Setup.apiName} - ${config.Setup.creator}`,
     });
   }
 });
 
+app.get("/api/v1/models", (req, res) => {
+  res.status(200).json({
+    Model: {
+      default: Object.keys(config.Model.validModelsDefault),
+      sdxl: Object.keys(config.Model.validModelsSDXL),
+      stylePresets: Object.keys(config.Model.validStylePresets),
+    },
+    status: 200,
+    creator: `${config.Setup.apiName} - ${config.Setup.creator}`,
+  });
+});
+
+
 app.get("/api/v1/styleSheet", (req, res) => {
   res.status(200).json({
-    stylePresets: config.Model.validStylePresets,
+    stylePresets: Object.keys(config.Model.validStylePresets),
     status: 200,
     creator: `${config.Setup.apiName} - ${config.Setup.creator}`,
   });
