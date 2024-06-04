@@ -114,10 +114,10 @@ app.get("/api/v1/generateImage", async (req, res) => {
     prompt,
     model,
     typeModel,
-    stylePreset,
+    stylePreset = "",
     height,
     width,
-    negativePrompt,
+    negativePrompt = "",
     upscale,
     view,
   } = req.query;
