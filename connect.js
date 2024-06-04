@@ -225,9 +225,8 @@ app.get("/api/v1/generateImage", async (req, res) => {
 
     const result = await generateFunc({
       prompt: prompt.trim(),
-      model: typemodel.trim()
-        ,
-      style_preset: typestyle.trim()
+      model: typemodel.trim(),
+      style_preset: typestyle.trim(),
       height: parseInt(height),
       width: parseInt(width),
       sampler: "DPM++ 2M Karras",
