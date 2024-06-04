@@ -201,9 +201,9 @@ app.get("/api/v1/generateImage", async (req, res) => {
             });
         }
 
-        if (view === 'json') {
+        if (view.toLowerCase() === 'json') {
             return res.status(200).json({ result: imageUrl, status: 200, creator: `${config.Setup.apiName} - ${config.Setup.creator}` });
-        }
+        } else if (view.toLowerCase() === 'image') {
         const response = await axios.get(imageUrl, { responseType: "arraybuffer" });
 
         const randomFilename = crypto.randomBytes(15).toString("hex").toUpperCase();
@@ -211,8 +211,8 @@ app.get("/api/v1/generateImage", async (req, res) => {
         res.set("Content-Type", "image/png");
         res.set("Content-Disposition", `inline; filename="TextToImage-${randomFilename}.png"`);
 
-        res.status(200).send(Buffer.from(response.data, "binary"));
-        console.log(chalk.green("Image sent successfully"));
+        return res.status(200).send(Buffer.from(response.data, "binary"));
+        }
     } catch (e) {
         console.error(chalk.red("Error occurred:"), e.message);
 
