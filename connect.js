@@ -210,13 +210,13 @@ app.get("/api/v1/generateImage", async (req, res) => {
   }
 
   try {
-    const generateFunc =
+    var generateFunc =
       typeModelLowerCase === "sdxl" ? generateImageSDXL : generateImage;
-    const typeModelConfig =
+    var typeModelConfig =
       config.Model[
         `validModels${typeModelLowerCase === "sdxl" ? "SDXL" : "Default"}`
       ][model];
-    const stylePresetConfig = stylePreset
+    var stylePresetConfig = stylePreset
       ? config.Model.validStylePresets[stylePreset]
       : "";
 
