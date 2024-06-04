@@ -137,7 +137,7 @@
                   "properties": {
                     "result": {
                       "type": "string",
-                      "example": "https://images.prodia.xyz/1992a4f8-20c7-4e33-8e42-26a44fa592b6.png",
+                      "example": "https://images.prodia.xyz/1992a4f8-20c7-4e33-8e42-26a44fa592b6.png"
                     },
                     "status": {
                       "type": "integer",
