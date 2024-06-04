@@ -114,10 +114,10 @@ app.get("/api/v1/generateImage", async (req, res) => {
     prompt,
     model,
     typeModel,
-    stylePreset = "",
+    stylePreset,
     height,
     width,
-    negativePrompt = "",
+    negativePrompt,
     upscale,
     view,
   } = req.query;
@@ -218,7 +218,7 @@ app.get("/api/v1/generateImage", async (req, res) => {
       ][model];
     var stylePresetConfig = stylePreset
       ? config.Model.validStylePresets[stylePreset]
-      : "";
+      : null;
 
     const result = await generateFunc({
       prompt: prompt.trim(),
@@ -229,7 +229,7 @@ app.get("/api/v1/generateImage", async (req, res) => {
       sampler: "DPM++ 2M Karras",
       seed: -1,
       cfg_scale: 7,
-      negative_prompt: negativePrompt ? negativePrompt.trim() : "",
+      negative_prompt: negativePrompt ? negativePrompt.trim() : null,
       steps: 20,
       upscale: upscale,
     });
