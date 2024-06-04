@@ -216,16 +216,18 @@ app.get("/api/v1/generateImage", async (req, res) => {
   try {
     const generateFunc =
       typeModelLowerCase === "sdxl" ? generateImageSDXL : generateImage;
+    var typemodel = config.Model[
+          `validModels${typeModelLowerCase === "sdxl" ? "SDXL" : "Default"}`
+        ][model];
+    var typestyle = stylePreset
+        ? config.Model.validStylePresets[stylePreset]
+        : "",
 
     const result = await generateFunc({
       prompt: prompt.trim(),
-      model:
-        config.Model[
-          `validModels${typeModelLowerCase === "sdxl" ? "SDXL" : "Default"}`
-        ][model],
-      style_preset: stylePreset
-        ? config.Model.validStylePresets[stylePreset.trim()]
-        : "",
+      model: typemodel.trim()
+        ,
+      style_preset: typestyle.trim()
       height: parseInt(height),
       width: parseInt(width),
       sampler: "DPM++ 2M Karras",
