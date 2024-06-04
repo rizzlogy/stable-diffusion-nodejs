@@ -38,8 +38,6 @@
         ],
         "summary": "Generate Image from Text Prompt",
         "description": "Endpoint to generate an image based on the provided text prompt and other parameters.",
-        "operationId": "generateImage",
-        "produces": ["image/png", "application/json"],
         "parameters": [
           {
             "name": "prompt",
@@ -202,8 +200,6 @@
         ],
         "summary": "Get Available Models",
         "description": "Endpoint to get the available models for image generation.",
-        "operationId": "models",
-        "produces": ["application/json"],
         "responses": {
           "200": {
             "description": "OK",
@@ -252,8 +248,6 @@
         ],
         "summary": "Get Available Style Presets",
         "description": "Endpoint to get the available style presets for image generation.",
-        "operationId": "styleSheet",
-        "produces": ["application/json"],
         "responses": {
           "200": {
             "description": "OK",
