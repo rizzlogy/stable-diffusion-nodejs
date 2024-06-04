@@ -84,7 +84,7 @@ app.get("/", async (req, res) => {
         await theme.getBuffer(SwaggerThemeNameEnum.DARK),
       ],
       customfavIcon:
-        "https://i.ibb.co.com/878zHng/Tak-berjudul4-20240604073614.png",
+        "https://i.ib.co.com/878zHng/Tak-berjudul4-20240604073614.png",
       customSiteTitle: swaggerDocument.info.title,
       customSiteDesc: swaggerDocument.info.description,
     }),
@@ -123,14 +123,9 @@ app.get("/api/v1/generateImage", async (req, res) => {
   } = req.query;
 
   if (!prompt || !model || !typeModel) {
-    console.log(
-      chalk.yellow(
-        "Missing parameters. Please provide prompt, model, and typeModel.",
-      ),
-    );
+    console.log(chalk.yellow("Missing parameters. Please provide prompt, model, and typeModel."));
     return res.status(400).json({
-      content:
-        "Missing parameters. Please provide prompt, model, and typeModel.",
+      content: "Missing parameters. Please provide prompt, model, and typeModel.",
       status: 400,
       creator: `${config.Setup.apiName} - ${config.Setup.creator}`,
     });
@@ -138,18 +133,9 @@ app.get("/api/v1/generateImage", async (req, res) => {
 
   const typeModelLowerCase = typeModel.toLowerCase();
 
-  if (
-    (typeModelLowerCase === "sdxl" &&
-      !config.Model.validModelsSDXL.hasOwnProperty(model)) ||
-    (typeModelLowerCase === "default" &&
-      !config.Model.validModelsDefault.hasOwnProperty(model))
-  ) {
+  if (!config.Model[`validModels${typeModelLowerCase === "sdxl" ? "SDXL" : "Default"}`][model]) {
     const validModels = typeModelLowerCase === "sdxl" ? "SDXL" : "default";
-    console.log(
-      chalk.yellow(
-        `Invalid model for ${validModels}. Please choose a valid ${validModels} model. See list of models in '/api/v1/models'.`,
-      ),
-    );
+    console.log(chalk.yellow(`Invalid model for ${validModels}. Please choose a valid ${validModels} model. See list of models in '/api/v1/models'.`));
     return res.status(400).json({
       content: `Invalid model for ${validModels}. Please choose a valid ${validModels} model. See list of models in '/api/v1/models'.`,
       status: 400,
@@ -157,13 +143,8 @@ app.get("/api/v1/generateImage", async (req, res) => {
     });
   }
 
-  if (
-    stylePreset &&
-    !config.Model.validStylePresets.hasOwnProperty(stylePreset)
-  ) {
-    console.log(
-      chalk.yellow("Invalid style preset. Please choose a valid style preset."),
-    );
+  if (stylePreset && !config.Model.validStylePresets[stylePreset]) {
+    console.log(chalk.yellow("Invalid style preset. Please choose a valid style preset."));
     return res.status(400).json({
       content: "Invalid style preset. Please choose a valid style preset.",
       status: 400,
@@ -176,14 +157,9 @@ app.get("/api/v1/generateImage", async (req, res) => {
   const validWidth = !isNaN(width) && width > 0 && width <= 1024;
 
   if (!validHeight || !validWidth) {
-    console.log(
-      chalk.yellow(
-        "Invalid height or width. Please provide values between 1 and 1024.",
-      ),
-    );
+    console.log(chalk.yellow("Invalid height or width. Please provide values between 1 and 1024."));
     return res.status(400).json({
-      content:
-        "Invalid height or width. Please provide values between 1 and 1024.",
+      content: "Invalid height or width. Please provide values between 1 and 1024.",
       status: 400,
       creator: `${config.Setup.apiName} - ${config.Setup.creator}`,
     });
@@ -191,9 +167,7 @@ app.get("/api/v1/generateImage", async (req, res) => {
 
   // Validate upscale
   if (upscale && upscale !== "true" && upscale !== "false") {
-    console.log(
-      chalk.yellow("Invalid upscale value. Please provide 'true' or 'false'."),
-    );
+    console.log(chalk.yellow("Invalid upscale value. Please provide 'true' or 'false'."));
     return res.status(400).json({
       content: "Invalid upscale value. Please provide 'true' or 'false'.",
       status: 400,
@@ -203,9 +177,7 @@ app.get("/api/v1/generateImage", async (req, res) => {
 
   // Validate view code
   if (view && view.toLowerCase() !== "json" && view.toLowerCase() !== "image") {
-    console.log(
-      chalk.yellow("Invalid view value. Please provide 'json' or 'image'."),
-    );
+    console.log(chalk.yellow("Invalid view value. Please provide 'json' or 'image'."));
     return res.status(400).json({
       content: "Invalid view value. Please provide 'json' or 'image'.",
       status: 400,
@@ -214,19 +186,14 @@ app.get("/api/v1/generateImage", async (req, res) => {
   }
 
   try {
-    const generateFunc =
-      typeModelLowerCase === "sdxl" ? generateImageSDXL : generateImage;
-    var typemodel = config.Model[
-          `validModels${typeModelLowerCase === "sdxl" ? "SDXL" : "Default"}`
-        ][model];
-    var typestyle = stylePreset
-        ? config.Model.validStylePresets[stylePreset]
-        : "",
+    const generateFunc = typeModelLowerCase === "sdxl" ? generateImageSDXL : generateImage;
+    const typeModelConfig = config.Model[`validModels${typeModelLowerCase === "sdxl" ? "SDXL" : "Default"}`][model];
+    const stylePresetConfig = stylePreset ? config.Model.validStylePresets[stylePreset] : "";
 
     const result = await generateFunc({
       prompt: prompt.trim(),
-      model: typemodel.trim(),
-      style_preset: typestyle.trim(),
+      model: typeModelConfig.trim(),
+      style_preset: stylePresetConfig.trim(),
       height: parseInt(height),
       width: parseInt(width),
       sampler: "DPM++ 2M Karras",
@@ -259,16 +226,10 @@ app.get("/api/v1/generateImage", async (req, res) => {
         responseType: "arraybuffer",
       });
 
-      const randomFilename = crypto
-        .randomBytes(15)
-        .toString("hex")
-        .toUpperCase();
+      const randomFilename = crypto.randomBytes(15).toString("hex").toUpperCase();
 
       res.set("Content-Type", "image/png");
-      res.set(
-        "Content-Disposition",
-        `inline; filename="TextToImage-${randomFilename}.png"`,
-      );
+      res.set("Content-Disposition", `inline; filename="TextToImage-${randomFilename}.png"`);
 
       return res.status(200).send(Buffer.from(response.data, "binary"));
     }
@@ -287,6 +248,7 @@ app.get("/api/v1/generateImage", async (req, res) => {
     });
   }
 });
+
 
 app.get("/api/v1/styleSheet", (req, res) => {
   res.status(200).json({
