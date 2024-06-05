@@ -21,6 +21,7 @@
         "cors": "^2.8.5",
         "express": "^4.17.1",
         "morgan": "^1.10.0",
+        "swagger-themes": "latest",
         "swagger-ui-express": "github:rizzlogy/swagger-ui-express",
         "prodia.js": "^3.0.0"
     }
