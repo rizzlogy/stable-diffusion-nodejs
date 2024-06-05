@@ -10,12 +10,6 @@
       "email": "support@rizzy.eu.org"
     }
   },
-  "servers": [
-    {
-      "url": "https://stablediff.rizzy.eu.org",
-      "description": "Production server"
-    }
-  ],
   "tags": [
     {
       "name": "Stablediff",
