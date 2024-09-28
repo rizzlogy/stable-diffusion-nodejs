@@ -185,16 +185,22 @@ app.get("/api/v1/generateImage", async (req, res) => {
     });
   }
 
-  const typeModelLowerCase = typeModel.toLowerCase();
+   const typeModelLowerCase = typeModel.toLowerCase();
 
-  const validModelsKey =
-    typeModelLowerCase === "sdxl" ? "validModelsSDXL" : "validModelsDefault";
-  if (!config.Model[validModelsKey]?.hasOwnProperty(model.toLowerCase())) {
+  if (
+    (typeModelLowerCase === "sdxl" &&
+      !config.Model.validModelsSDXL.hasOwnProperty(model.toLowerCase())) ||
+    (typeModelLowerCase === "default" &&
+      !config.Model.validModelsDefault.hasOwnProperty(model.toLowerCase()))
+  ) {
     const validModels = typeModelLowerCase === "sdxl" ? "SDXL" : "default";
-    const message = `Invalid model for ${validModels}. Please choose a valid ${validModels} model. See list of models in '/api/v1/models'.`;
-    console.log(chalk.yellow(message));
+    console.log(
+      chalk.yellow(
+        `Invalid model for ${validModels}. Please choose a valid ${validModels} model. See list of models in '/api/v1/models'.`
+      )
+    );
     return res.status(400).json({
-      content: message,
+      content: `Invalid model for ${validModels}. Please choose a valid ${validModels} model. See list of models in '/api/v1/models'.`,
       status: 400,
       creator: `${config.Setup.apiName} - ${config.Setup.creator}`,
     });
