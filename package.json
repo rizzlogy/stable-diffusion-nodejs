@@ -1,5 +1,5 @@
 {
-    "name": "stable-diffusion",
+    "name": "stable-diffusion-nodejs",
     "version": "1.0.0",
     "description": "Simple API for generating images from text prompts using Prodia.",
     "main": "connect.js",
