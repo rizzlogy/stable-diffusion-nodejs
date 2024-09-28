@@ -1,7 +1,7 @@
 {
     "name": "stable-diffusion",
     "version": "1.0.0",
-    "description": "ok",
+    "description": "Simple API for generating images from text prompts using Prodia.",
     "main": "connect.js",
     "scripts": {
         "start": "node connect.js"
@@ -12,7 +12,7 @@
         "nodejs",
         "web"
     ],
-    "author": "RizzyFuzz & FastURL",
+    "author": "RizzyFuzz",
     "license": "MIT",
     "dependencies": {
         "axios": "^1.7.2",
@@ -20,9 +20,10 @@
         "chalk": "^4.1.2",
         "cors": "^2.8.5",
         "express": "^4.17.1",
+        "express-rate-limit": "^7.4.0",
         "morgan": "^1.10.0",
+        "prodia.js": "^3.0.0",
         "swagger-themes": "latest",
-        "swagger-ui-express": "github:rizzlogy/swagger-ui-express",
-        "prodia.js": "^3.0.0"
+        "swagger-ui-express": "github:rizzlogy/swagger-ui-express"
     }
 }

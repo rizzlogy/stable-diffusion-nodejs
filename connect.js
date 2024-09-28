@@ -1,4 +1,5 @@
 const express = require("express");
+const rateLimit = require('express-rate-limit');
 const axios = require("axios");
 const crypto = require("crypto");
 const config = require("./config.json");
@@ -11,17 +12,31 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./swagger.json");
 const { SwaggerTheme, SwaggerThemeNameEnum } = require("swagger-themes");
 const theme = new SwaggerTheme();
+
+if (!config.Setup.key) {
+  console.error(chalk.red("\n\nPlease Input Your Prodia Apikey In config.json\n\nVisit this web to get apikey: https://app.prodia.com/api\n\n"));
+  process.exit(1);
+}
 const { generateImage, generateImageSDXL, wait } = Prodia(config.Setup.key);
 
 const app = express();
 const PORT = process.env.PORT || 4000;
-
+const apiLimiter = rateLimit({
+  windowMs: 5 * 1000,
+  max: 50,
+  message: {
+    content: 'Too many requests.',
+    status: 429,
+    creator: `${config.Setup.apiName} - ${config.Setup.creator}`,
+  }
+});
 app.set("json spaces", 2);
-app.set("trust proxy", true);
+app.set('trust proxy', 1);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 app.use(swaggerUi.serve);
+app.use('/api/', apiLimiter);
 
 function formatBytes(bytes, decimals = 2) {
   if (bytes === 0) return "0 Bytes";
@@ -88,7 +103,7 @@ app.get("/", async (req, res) => {
   `;
   res.send(
     swaggerUi.generateHTML(swaggerDocument, {
-      customCss: customCss + (await theme.getBuffer(SwaggerThemeNameEnum.DARK)),
+      customCss: customCss + (await theme.getBuffer(SwaggerThemeNameEnum.DRACULA)),
       customfavIcon:
         "https://i.ib.co.com/878zHng/Tak-berjudul4-20240604073614.png",
       customSiteTitle: swaggerDocument.info.title,
@@ -148,15 +163,18 @@ app.get("/api/v1/generateImage", async (req, res) => {
     view,
   });
 
-  if (!prompt || !model || !typeModel || !view) {
-    console.log(
-      chalk.yellow(
-        "Missing parameters. Please provide prompt, model, typeModel and view.",
-      ),
-    );
+  const missingParams = [];
+  if (!prompt) missingParams.push("prompt");
+  if (!model) missingParams.push("model");
+  if (!typeModel) missingParams.push("typeModel");
+  if (!stylePreset) missingParams.push("stylePreset");
+  if (!view) missingParams.push("view");
+
+  if (missingParams.length > 0) {
+    const message = `Missing parameters: ${missingParams.join(", ")}.`;
+    console.log(chalk.yellow(message));
     return res.status(400).json({
-      content:
-        "Missing parameters. Please provide prompt, model, typeModel and view.",
+      content: message,
       status: 400,
       creator: `${config.Setup.apiName} - ${config.Setup.creator}`,
     });
@@ -164,76 +182,70 @@ app.get("/api/v1/generateImage", async (req, res) => {
 
   const typeModelLowerCase = typeModel.toLowerCase();
 
-  if (
-    (typeModelLowerCase === "sdxl" &&
-      !config.Model.validModelsSDXL.hasOwnProperty(model)) ||
-    (typeModelLowerCase === "default" &&
-      !config.Model.validModelsDefault.hasOwnProperty(model))
-  ) {
+  const validModelsKey =
+    typeModelLowerCase === "sdxl" ? "validModelsSDXL" : "validModelsDefault";
+  if (!config.Model[validModelsKey]?.hasOwnProperty(model.toLowerCase())) {
     const validModels = typeModelLowerCase === "sdxl" ? "SDXL" : "default";
-    console.log(
-      chalk.yellow(
-        `Invalid model for ${validModels}. Please choose a valid ${validModels} model. See list of models in '/api/v1/models'.`,
-      ),
-    );
+    const message = `Invalid model for ${validModels}. Please choose a valid ${validModels} model. See list of models in '/api/v1/models'.`;
+    console.log(chalk.yellow(message));
     return res.status(400).json({
-      content: `Invalid model for ${validModels}. Please choose a valid ${validModels} model. See list of models in '/api/v1/models'.`,
+      content: message,
       status: 400,
       creator: `${config.Setup.apiName} - ${config.Setup.creator}`,
     });
   }
 
-  if (
-    stylePreset &&
-    !config.Model.validStylePresets.hasOwnProperty(stylePreset)
-  ) {
-    console.log(
-      chalk.yellow("Invalid style preset. Please choose a valid style preset."),
-    );
-    return res.status(400).json({
-      content: "Invalid style preset. Please choose a valid style preset.",
-      status: 400,
-      creator: `${config.Setup.apiName} - ${config.Setup.creator}`,
-    });
+  let styleValue = null;
+  if (stylePreset) {
+    const styleToLowerCase = stylePreset.toLowerCase();
+    styleValue =
+      styleToLowerCase === "default"
+        ? null
+        : config.Model.validStylePresets[styleToLowerCase];
+
+    if (!styleValue && styleToLowerCase !== "default") {
+      const message = "Invalid style preset. Please choose a valid style preset.";
+      console.log(chalk.yellow(message));
+      return res.status(400).json({
+        content: message,
+        status: 400,
+        creator: `${config.Setup.apiName} - ${config.Setup.creator}`,
+      });
+    }
   }
 
-  // Validate height and width
-  const validHeight = !isNaN(height) && height > 0 && height <= 1024;
-  const validWidth = !isNaN(width) && width > 0 && width <= 1024;
+  const heightValue = height === "default" || height === "0" ? null : parseInt(height);
+  const widthValue = width === "default" || width === "0" ? null : parseInt(width);
+
+  const validHeight = heightValue === null || (heightValue > 0 && heightValue <= 1024);
+  const validWidth = widthValue === null || (widthValue > 0 && widthValue <= 1024);
 
   if (!validHeight || !validWidth) {
-    console.log(
-      chalk.yellow(
-        "Invalid height or width. Please provide values between 1 and 1024.",
-      ),
-    );
+    const message =
+      "Invalid height or width. Please provide values between 1 and 1024, or use 'default' or '0'.";
+    console.log(chalk.yellow(message));
     return res.status(400).json({
-      content:
-        "Invalid height or width. Please provide values between 1 and 1024.",
+      content: message,
       status: 400,
       creator: `${config.Setup.apiName} - ${config.Setup.creator}`,
     });
   }
 
-  // Validate upscale
-  if (upscale && upscale !== "true" && upscale !== "false") {
-    console.log(
-      chalk.yellow("Invalid upscale value. Please provide 'true' or 'false'."),
-    );
+  if (upscale && upscale.toLowerCase() !== "true" && upscale.toLowerCase() !== "false") {
+    const message = "Invalid upscale value. Please provide 'true' or 'false'.";
+    console.log(chalk.yellow(message));
     return res.status(400).json({
-      content: "Invalid upscale value. Please provide 'true' or 'false'.",
+      content: message,
       status: 400,
       creator: `${config.Setup.apiName} - ${config.Setup.creator}`,
     });
   }
 
-  // Validate view
-  if (view && view !== "json" && view !== "image") {
-    console.log(
-      chalk.yellow("Invalid view value. Please provide 'json' or 'image'."),
-    );
+  if (view && view.toLowerCase() !== "json" && view.toLowerCase() !== "image") {
+    const message = "Invalid view value. Please provide 'json' or 'image'.";
+    console.log(chalk.yellow(message));
     return res.status(400).json({
-      content: "Invalid view value. Please provide 'json' or 'image'.",
+      content: message,
       status: 400,
       creator: `${config.Setup.apiName} - ${config.Setup.creator}`,
     });
@@ -243,47 +255,43 @@ app.get("/api/v1/generateImage", async (req, res) => {
     const generateFunc =
       typeModelLowerCase === "sdxl" ? generateImageSDXL : generateImage;
 
-    const result = await generateFunc({
+    const generationParams = {
       prompt: prompt.trim(),
       model:
         config.Model[
           `validModels${typeModelLowerCase === "sdxl" ? "SDXL" : "Default"}`
-        ][model],
-      style_preset: stylePreset
-        ? config.Model.validStylePresets[stylePreset]
-        : undefined,
-      height: parseInt(height),
-      width: parseInt(width),
+        ][model.toLowerCase()],
       sampler: "DPM++ 2M Karras",
       seed: -1,
       cfg_scale: 7,
-      negative_prompt: negativePrompt ? negativePrompt.trim() : "",
       steps: 20,
-      upscale: upscale,
-    });
+      upscale: upscale ? upscale.toLowerCase() === "true" : undefined,
+    };
 
-    console.log(chalk.blue("Parameters passed to generateFunc:"), {
-      prompt: prompt.trim(),
-      negativePrompt: negativePrompt ? negativePrompt.trim() : "",
-      model:
-        config.Model[
-          `validModels${typeModelLowerCase === "sdxl" ? "SDXL" : "Default"}`
-        ][model],
-      stylePreset: stylePreset
-        ? config.Model.validStylePresets[stylePreset]
-        : undefined,
-      height,
-      width,
-      upscale: upscale,
-      view,
-    });
+    if (validHeight && heightValue !== null) {
+      generationParams.height = heightValue;
+    }
+    if (validWidth && widthValue !== null) {
+      generationParams.width = widthValue;
+    }
+    if (styleValue && styleValue !== null) {
+      generationParams.style_preset = styleValue;
+    }
+    if (negativePrompt) {
+      generationParams.negative_prompt = negativePrompt.trim();
+    }
+
+    const result = await generateFunc(generationParams);
+
+    console.log(chalk.blue("Parameters passed to generateFunc:"), generationParams);
 
     const { status, imageUrl } = await wait(result);
 
     if (status === "failed") {
-      console.log(chalk.red("Stable diffusion failed. Try again later."));
+      const message = "Stable diffusion failed. Try again later.";
+      console.log(chalk.red(message));
       return res.status(500).json({
-        content: "Stable diffusion failed. Try again later.",
+        content: message,
         status: 500,
         creator: `${config.Setup.apiName} - ${config.Setup.creator}`,
       });
@@ -297,20 +305,12 @@ app.get("/api/v1/generateImage", async (req, res) => {
         creator: `${config.Setup.apiName} - ${config.Setup.creator}`,
       });
     } else if (view.toLowerCase() === "image") {
-      const response = await axios.get(imageUrl, {
-        responseType: "arraybuffer",
-      });
+      const response = await axios.get(imageUrl, { responseType: "arraybuffer" });
 
-      const randomFilename = crypto
-        .randomBytes(15)
-        .toString("hex")
-        .toUpperCase();
+      const randomFilename = crypto.randomBytes(5).toString("hex").toUpperCase();
       console.log(chalk.green("Image sent successfully"));
       res.set("Content-Type", "image/png");
-      res.set(
-        "Content-Disposition",
-        `inline; filename="TextToImage-${randomFilename}.png"`,
-      );
+      res.set("Content-Disposition", `inline; filename="Stablediff-${randomFilename}.png"`);
       return res.send(Buffer.from(response.data, "binary"));
     }
   } catch (e) {
@@ -330,7 +330,7 @@ app.get("/api/v1/generateImage", async (req, res) => {
 
 app.get("/api/v1/styleSheet", (req, res) => {
   res.status(200).json({
-    stylePresets: config.Model.validStylePresets,
+    stylePresets: Object.keys(config.Model.validStylePresets),
     status: 200,
     creator: `${config.Setup.apiName} - ${config.Setup.creator}`,
   });

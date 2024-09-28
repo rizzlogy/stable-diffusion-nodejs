@@ -3,31 +3,31 @@
   "info": {
     "version": "3.5.0",
     "title": "Stable Diffusion API",
-    "description": "API for generating images from text prompts using Prodia.",
+    "description": "Simple API for generating images from text prompts using Prodia.",
     "contact": {
-      "name": "RizzyFuzz",
+      "name": "Open Source",
       "url": "https://rizzy.eu.org",
       "email": "support@rizzy.eu.org"
     }
   },
   "tags": [
     {
-      "name": "Stablediff",
+      "name": "stablediff",
       "description": "Endpoints related to generating images using AI"
     },
     {
-      "name": "Models",
+      "name": "models",
       "description": "Endpoints to check available models for image generation"
     },
     {
-      "name": "Style Presets",
+      "name": "style presets",
       "description": "Endpoints to check available style presets for image generation"
     }
   ],
   "paths": {
     "/api/v1/generateImage": {
       "get": {
-        "tags": ["Stablediff"],
+        "tags": ["stablediff"],
         "summary": "Generate Image from Text Prompt",
         "description": "Endpoint to generate an image based on the provided text prompt and other parameters.",
         "parameters": [
@@ -58,7 +58,7 @@
             "description": "The type of model.",
             "schema": {
               "type": "string",
-              "enum": ["default", "SDXL"]
+              "enum": ["default", "sdxl"]
             }
           },
           {
@@ -84,30 +84,31 @@
           {
             "name": "stylePreset",
             "in": "query",
-            "required": false,
+            "required": true,
             "description": "The style preset for image generation.",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "default": "default"
             }
           },
           {
             "name": "height",
             "in": "query",
             "required": true,
-            "description": "The image height.",
+            "description": "The image height, Please provide values between 1 and 1024, or use 'default' or '0'.",
             "schema": {
-              "type": "integer",
-              "default": 1024
+              "type": "string",
+              "default": "default"
             }
           },
           {
             "name": "width",
             "in": "query",
             "required": true,
-            "description": "The image width.",
+            "description": "The image width, Please provide values between 1 and 1024, or use 'default' or '0'.",
             "schema": {
-              "type": "integer",
-              "default": 720
+              "type": "string",
+              "default": "default"
             }
           },
           {
@@ -139,7 +140,7 @@
                     },
                     "creator": {
                       "type": "string",
-                      "example": "Stable Diffusion - ©RizzyFuzz & FastURL"
+                      "example": "Stable Diffusion - ©RizzyFuzz"
                     }
                   }
                 }
@@ -153,7 +154,7 @@
             }
           },
           "400": {
-            "description": "Bad Request",
+            "description": "Missing parameters",
             "content": {
               "application/json": {
                 "schema": {
@@ -165,11 +166,11 @@
                     },
                     "content": {
                       "type": "string",
-                      "example": "Bad Request"
+                      "example": "Missing parameters: parameters"
                     },
-                    "error": {
+                    "creator": {
                       "type": "string",
-                      "example": "Invalid model parameter for the specified typeModel, model, or stylePreset"
+                      "example": "Stable Diffusion - ©RizzyFuzz"
                     }
                   }
                 }
@@ -191,9 +192,33 @@
                       "type": "string",
                       "example": "Internal Server Error"
                     },
-                    "error": {
+                    "creator": {
                       "type": "string",
-                      "example": "Failed to process the request"
+                      "example": "Stable Diffusion - ©RizzyFuzz"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 429
+                    },
+                    "content": {
+                      "type": "string",
+                      "example": "Too many requests."
+                    },
+                    "creator": {
+                      "type": "string",
+                      "example": "Stable Diffusion - ©RizzyFuzz"
                     }
                   }
                 }
@@ -205,7 +230,7 @@
     },
     "/api/v1/models": {
       "get": {
-        "tags": ["Models"],
+        "tags": ["models"],
         "summary": "Get Available Models",
         "description": "Endpoint to get the available models for image generation.",
         "responses": {
@@ -216,7 +241,7 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "Model": {
+                    "model": {
                       "type": "object",
                       "properties": {
                         "default": {
@@ -239,7 +264,7 @@
                     },
                     "creator": {
                       "type": "string",
-                      "example": "Stable Diffusion - ©RizzyFuzz & FastURL"
+                      "example": "Stable Diffusion - ©RizzyFuzz"
                     }
                   }
                 }
@@ -251,7 +276,7 @@
     },
     "/api/v1/styleSheet": {
       "get": {
-        "tags": ["Style Presets"],
+        "tags": ["style presets"],
         "summary": "Get Available Style Presets",
         "description": "Endpoint to get the available style presets for image generation.",
         "responses": {
@@ -275,7 +300,7 @@
                     },
                     "creator": {
                       "type": "string",
-                      "example": "Stable Diffusion - ©RizzyFuzz & FastURL"
+                      "example": "Stable Diffusion - ©RizzyFuzz"
                     }
                   }
                 }
