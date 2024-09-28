@@ -9,5 +9,7 @@ This API is provided strictly for educational and experimental purposes. It is n
 ## Attention 
 The API usage is capped at 50 requests per day to ensure fair usage for all users. Once the daily limit is reached, you’ll need to wait until the next day for your quota to reset. Be sure to make the most out of your requests and plan ahead!
 
+A special thank you to **[Prodia.com](https://prodia.com/)** for providing the AI technology that powers this platform.
+
 Best regards,
 RizzyFuzz
