@@ -6,7 +6,7 @@
     "description": "Simple API for generating images from text prompts using Prodia.",
     "contact": {
       "name": "Open Source",
-      "url": "https://rizzy.eu.org",
+      "url": "https://github.com/rizzlogy/stable-diffusion-nodejs",
       "email": "support@rizzy.eu.org"
     }
   },
