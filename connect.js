@@ -185,7 +185,7 @@ app.get("/api/v1/generateImage", async (req, res) => {
     });
   }
 
-   const typeModelLowerCase = typeModel.toLowerCase();
+  const typeModelLowerCase = typeModel.toLowerCase();
 
   if (
     (typeModelLowerCase === "sdxl" &&
@@ -196,8 +196,8 @@ app.get("/api/v1/generateImage", async (req, res) => {
     const validModels = typeModelLowerCase === "sdxl" ? "SDXL" : "default";
     console.log(
       chalk.yellow(
-        `Invalid model for ${validModels}. Please choose a valid ${validModels} model. See list of models in '/api/v1/models'.`
-      )
+        `Invalid model for ${validModels}. Please choose a valid ${validModels} model. See list of models in '/api/v1/models'.`,
+      ),
     );
     return res.status(400).json({
       content: `Invalid model for ${validModels}. Please choose a valid ${validModels} model. See list of models in '/api/v1/models'.`,
