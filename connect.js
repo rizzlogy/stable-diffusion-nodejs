@@ -133,7 +133,7 @@ app.get("/api/v1/models", (req, res) => {
   res.status(200).json({
     Model: {
       default: Object.keys(config.Model.validModelsDefault),
-      sdxl: Object.keys(config.Model.validModelsSDXL)
+      sdxl: Object.keys(config.Model.validModelsSDXL),
     },
     status: 200,
     creator: `${config.Setup.apiName} - ${config.Setup.creator}`,
