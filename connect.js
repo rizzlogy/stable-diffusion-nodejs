@@ -37,7 +37,7 @@ const apiLimiter = rateLimit({
 app.set("json spaces", 2);
 app.set("trust proxy", 1);
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors());
 app.use(swaggerUi.serve);
 app.use("/api/", apiLimiter);
